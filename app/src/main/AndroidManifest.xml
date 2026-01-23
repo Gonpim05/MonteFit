@@ -11,15 +11,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MonteFit">
+
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".RegistroActivity"
+            android:exported="false" />
+
+        <activity android:name=".PantallaInicialActivity" android:exported="false"/>
+        <activity android:name=".EntrenarActivity" android:exported="false"/>
+        <activity android:name=".ComidaActivity" android:exported="false"/>
+        <activity android:name=".PerfilActivity" android:exported="false"/>
+        <activity android:name=".DetalleEntrenamientoActivity" android:exported="false"/>
+        <activity android:name=".LogrosActivity" android:exported="false"/>
+        <activity android:name=".SocialActivity" android:exported="false"/>
+
     </application>
 
 </manifest>

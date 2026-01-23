@@ -10,18 +10,16 @@
     android:background="#FFFFFF"
     tools:context=".MainActivity">
 
-
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="215dp"
         android:layout_height="244dp"
         android:layout_marginTop="40dp"
-        android:contentDescription="@string/logo_app"
+        android:contentDescription="Logo de la aplicación"
         android:src="@drawable/montefit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 
     <TextView
         android:id="@+id/RegistroTxt"
@@ -36,7 +34,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
     <EditText
         android:id="@+id/correo"
         android:layout_width="0dp"
@@ -47,13 +44,15 @@
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
         android:padding="10dp"
+        android:textColorHint="#757575"
+        android:textColor="#000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/RegistroTxt" />
 
-
+    <!-- He cambiado 'contraseña' por 'contrasena' para evitar errores de compilación -->
     <EditText
-        android:id="@+id/contraseña"
+        android:id="@+id/contrasena"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -62,24 +61,25 @@
         android:inputType="textPassword"
         android:minHeight="48dp"
         android:padding="10dp"
+        android:textColorHint="#757575"
+        android:textColor="#000000"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/correo" />
 
-
     <Button
-        android:id="@+id/botonRegistrate"
+        android:id="@+id/botonLoguear"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
+        android:backgroundTint="#6200EE"
         android:text="Iniciar sesión"
         android:textAllCaps="false"
-        android:backgroundTint="#6200EE"
         android:textColor="#FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/contraseña"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@id/contrasena" />
 
     <TextView
         android:id="@+id/textoRegistro"
@@ -87,21 +87,24 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="¿No tienes cuenta?"
+        android:textColor="#000000"
         android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@id/botonRegistrate"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/botonLoguear" />
 
     <Button
         android:id="@+id/botonRegistro"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="19dp"
         android:text="Registrarte"
         android:textAllCaps="false"
         android:textColor="#6200EE"
-        android:background="@android:color/transparent"
-        app:layout_constraintTop_toBottomOf="@id/textoRegistro"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/textoRegistro" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
