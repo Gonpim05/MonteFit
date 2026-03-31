@@ -8,18 +8,23 @@
     android:background="@color/background_light">
 
     <!-- Header / Cabecera -->
+
     <View
         android:id="@+id/headerBackground"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="150dp"
         android:background="@color/primary_fitness"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Lista de Entrenamientos -->
 
     <TextView
         android:id="@+id/tvTituloMfit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="40dp"
         android:text="MONTE FIT"
         android:textColor="@color/white"
         android:textSize="24sp"
@@ -32,15 +37,15 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="28dp"
         android:text="Tus últimos entrenamientos"
         android:textColor="@color/white"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTituloMfit" />
 
-    <!-- Lista de Entrenamientos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEntrenamientos"
         android:layout_width="0dp"
@@ -130,12 +135,12 @@
         android:id="@+id/btnPerfil"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="36dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/boton_redondeado"
         android:text="Perfil"
-        android:textSize="12sp"
         android:textColor="@color/white"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
