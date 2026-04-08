@@ -16,23 +16,23 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.Calendar;
 
-public class SocialActivity extends AppCompatActivity {
+public class PantallaSocial extends AppCompatActivity {
 
     private Spinner spinnerEjercicios;
     private RecyclerView recyclerView;
     private TextView tvSemanaActual;
     private Button btnBuscarUsuario;
-    private DatabaseHelper dbHelper;
+    private GestorBaseDatos gestorBD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_social);
+        setContentView(R.layout.pantalla_social);
 
-        dbHelper = UserManager.getInstance().getDbHelper();
-        if (dbHelper == null) {
-            UserManager.getInstance().init(this);
-            dbHelper = UserManager.getInstance().getDbHelper();
+        gestorBD = GestorUsuarios.getInstance().getDbHelper();
+        if (gestorBD == null) {
+            GestorUsuarios.getInstance().init(this);
+            gestorBD = GestorUsuarios.getInstance().getDbHelper();
         }
 
         spinnerEjercicios = findViewById(R.id.spinnerEjerciciosRanking);
@@ -55,7 +55,7 @@ public class SocialActivity extends AppCompatActivity {
     private void setupSpinner() {
         String[] ejerciciosPrincipales = { "Press Banca", "Peso Muerto", "Sentadilla" };
         final int[] ejercicioIds = new int[3];
-        Cursor allExercises = dbHelper.getAllEjercicios();
+        Cursor allExercises = gestorBD.getAllEjercicios();
         if (allExercises != null && allExercises.moveToFirst()) {
             do {
                 @SuppressLint("Range")
@@ -85,23 +85,23 @@ public class SocialActivity extends AppCompatActivity {
             finish();
             return;
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+        ArrayAdapter<String> miAdaptador = new ArrayAdapter<>(
                 this,
                 android.R.layout.simple_spinner_item,
                 ejerciciosPrincipales);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerEjercicios.setAdapter(adapter);
+        miAdaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerEjercicios.setAdapter(miAdaptador);
 
         spinnerEjercicios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position >= 0 && position < ejercicioIds.length) {
-                    loadRankingsForExercise(ejercicioIds[position]);
+            public void onItemSelected(AdapterView<?> padre, View vista, int posicion, long id) {
+                if (posicion >= 0 && posicion < ejercicioIds.length) {
+                    loadRankingsForExercise(ejercicioIds[posicion]);
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onNothingSelected(AdapterView<?> padre) {
             }
         });
     }
@@ -112,27 +112,27 @@ public class SocialActivity extends AppCompatActivity {
             return;
         }
 
-        Cursor rankingsCursor = dbHelper.getEstadisticasRanking(ejercicioId);
+        Cursor rankingsCursor = gestorBD.getEstadisticasRanking(ejercicioId);
         if (rankingsCursor != null && rankingsCursor.getCount() > 0) {
-            SocialAdapter adapter = new SocialAdapter(this, rankingsCursor);
-            recyclerView.setAdapter(adapter);
+            InterfazListaSocial miAdaptador = new InterfazListaSocial(this, rankingsCursor);
+            recyclerView.setAdapter(miAdaptador);
         } else {
-            // Empty adapter or clear list
+            // Empty miAdaptador or clear list
             recyclerView.setAdapter(null);
             Toast.makeText(this, "Aún no hay rankings para este ejercicio esta semana", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void mostrarDialogoBusquedaUsuario() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Buscar Usuario");
+        android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
+        constructorDialogo.setTitle("Buscar Usuario");
 
         final android.widget.EditText inputNombre = new android.widget.EditText(this);
         inputNombre.setHint("Nombre del usuario");
         inputNombre.setPadding(50, 40, 50, 40);
-        builder.setView(inputNombre);
+        constructorDialogo.setView(inputNombre);
 
-        builder.setPositiveButton("Buscar", (dialog, which) -> {
+        constructorDialogo.setPositiveButton("Buscar", (miDialogo, which) -> {
             String nombre = inputNombre.getText().toString().trim();
             if (!nombre.isEmpty()) {
                 buscarYMostrarUsuario(nombre);
@@ -140,29 +140,29 @@ public class SocialActivity extends AppCompatActivity {
                 Toast.makeText(this, "Ingresa un nombre", Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
+        constructorDialogo.setNegativeButton("Cancelar", null);
+        constructorDialogo.show();
     }
 
     @SuppressLint("Range")
     private void buscarYMostrarUsuario(String nombre) {
-        Cursor cursor = dbHelper.getUserByName(nombre);
+        Cursor datosBD = gestorBD.getUserByName(nombre);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            int userId = cursor.getInt(cursor.getColumnIndex("id"));
-            String nombreUsuario = cursor.getString(cursor.getColumnIndex("nombre"));
-            cursor.close();
+        if (datosBD != null && datosBD.moveToFirst()) {
+            int userId = datosBD.getInt(datosBD.getColumnIndex("id"));
+            String nombreUsuario = datosBD.getString(datosBD.getColumnIndex("nombre"));
+            datosBD.close();
 
             mostrarEntrenamientosUsuario(userId, nombreUsuario);
         } else {
             Toast.makeText(this, "Usuario no encontrado", Toast.LENGTH_SHORT).show();
-            if (cursor != null)
-                cursor.close();
+            if (datosBD != null)
+                datosBD.close();
         }
     }
 
     private void mostrarEntrenamientosUsuario(int userId, String nombreUsuario) {
-        Cursor entrenamientos = dbHelper.getUserTrainingsByUserId(userId);
+        Cursor entrenamientos = gestorBD.getUserTrainingsByUserId(userId);
 
         if (entrenamientos == null || entrenamientos.getCount() == 0) {
             Toast.makeText(this, nombreUsuario + " no tiene entrenamientos registrados", Toast.LENGTH_SHORT).show();
@@ -184,21 +184,21 @@ public class SocialActivity extends AppCompatActivity {
             sb.append("📅 ").append(fecha).append("\n");
 
 
-            Cursor detalles = dbHelper.getTrainingDetails(rutinaId);
+            Cursor detalles = gestorBD.getTrainingDetails(rutinaId);
             if (detalles != null && detalles.moveToFirst()) {
                 do {
                     @SuppressLint("Range")
-                    String ejercicio = detalles.getString(detalles.getColumnIndex("exercise_name"));
+                    String ejercicio = detalles.getString(detalles.getColumnIndex("nombre_ejercicio"));
                     @SuppressLint("Range")
                     int series = detalles.getInt(detalles.getColumnIndex("series"));
                     @SuppressLint("Range")
-                    int reps = detalles.getInt(detalles.getColumnIndex("reps"));
+                    int repeticiones = detalles.getInt(detalles.getColumnIndex("repeticiones"));
                     @SuppressLint("Range")
-                    double weight = detalles.getDouble(detalles.getColumnIndex("weight"));
+                    double peso = detalles.getDouble(detalles.getColumnIndex("peso"));
 
                     sb.append("  • ").append(ejercicio).append(": ")
-                            .append(series).append("x").append(reps)
-                            .append(" - ").append(weight).append("kg\n");
+                            .append(series).append("x").append(repeticiones)
+                            .append(" - ").append(peso).append("kg\n");
                 } while (detalles.moveToNext());
                 detalles.close();
             }
@@ -219,3 +219,35 @@ public class SocialActivity extends AppCompatActivity {
                 .show();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

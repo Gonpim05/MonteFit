@@ -10,12 +10,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
 
-public class DetalleEntrenamientoActivity extends AppCompatActivity {
+public class PantallaDetalleEntrenamiento extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detalle_entrenamiento);
+        setContentView(R.layout.pantalla_detalle_entrenamiento);
 
         TextView tvTitulo = findViewById(R.id.tvTituloDetalle);
         ListView lvEjercicios = findViewById(R.id.lvEjerciciosDetalle);
@@ -30,13 +30,13 @@ public class DetalleEntrenamientoActivity extends AppCompatActivity {
             java.util.List<String> displayList = new java.util.ArrayList<>();
 
             for (Entrenamiento.EjercicioDetalle ed : entrenamiento.getEjerciciosDetalle()) {
-                String item = ed.nombre + ": " + ed.series + " series x " + ed.peso + " kg";
-                displayList.add(item);
+                String elemento = ed.nombre + ": " + ed.series + " series x " + ed.peso + " kg";
+                displayList.add(elemento);
                 totalPeso += (ed.series * ed.peso);
             }
 
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, displayList);
-            lvEjercicios.setAdapter(adapter);
+            ArrayAdapter<String> miAdaptador = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, displayList);
+            lvEjercicios.setAdapter(miAdaptador);
 
             tvTotalKilos.setText("Total Kilos Levantados: " + String.format("%.1f", totalPeso) + " kg");
         } else {
@@ -45,3 +45,9 @@ public class DetalleEntrenamientoActivity extends AppCompatActivity {
         }
     }
 }
+
+
+
+
+
+

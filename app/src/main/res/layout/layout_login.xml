@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:padding="24dp"
     android:background="#FFFFFF"
-    tools:context=".MainActivity">
+    tools:context=".PantallaPrincipal">
 
     <ImageView
         android:id="@+id/imageView"
@@ -108,3 +108,14 @@
         app:layout_constraintTop_toTopOf="@+id/textoRegistro" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+

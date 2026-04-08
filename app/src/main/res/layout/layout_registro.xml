@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:padding="24dp"
     android:background="#FFFFFF"
-    tools:context=".MainActivity">
+    tools:context=".PantallaPrincipal">
 
     <!-- LOGO -->
     <ImageView
@@ -125,3 +125,14 @@
         app:layout_constraintTop_toBottomOf="@id/botonRegistrate" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+

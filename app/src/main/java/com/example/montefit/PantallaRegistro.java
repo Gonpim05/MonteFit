@@ -14,7 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-public class RegistroActivity extends AppCompatActivity {
+public class PantallaRegistro extends AppCompatActivity {
 
     // 1. Declaramos las variables (usando TextInputEditText para tus campos con
     // Material Design)
@@ -29,7 +29,7 @@ public class RegistroActivity extends AppCompatActivity {
         // Habilitar diseño Edge-to-Edge
         EdgeToEdge.enable(this);
 
-        // 2. Cargamos el layout de registro (ASEGÚRATE de que el nombre coincida con tu
+        // 2. Cargamos el contenedor de registro (ASEGÚRATE de que el nombre coincida con tu
         // archivo .xml)
         // Si tu archivo se llama layout_registro.xml, cámbialo aquí:
         setContentView(R.layout.layout_registro);
@@ -55,21 +55,21 @@ public class RegistroActivity extends AppCompatActivity {
         btnRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = etCorreo.getText().toString().trim();
+                String correo = etCorreo.getText().toString().trim();
                 String pass = etContrasena.getText().toString().trim();
                 String nombre = etNombre.getText().toString().trim();
 
-                if (email.isEmpty() || pass.isEmpty() || nombre.isEmpty()) {
-                    Toast.makeText(RegistroActivity.this, "Por favor, rellena todos los datos", Toast.LENGTH_SHORT)
+                if (correo.isEmpty() || pass.isEmpty() || nombre.isEmpty()) {
+                    Toast.makeText(PantallaRegistro.this, "Por favor, rellena todos los datos", Toast.LENGTH_SHORT)
                             .show();
                 } else {
-                    if (UserManager.getInstance().register(email, pass, nombre)) {
-                        Toast.makeText(RegistroActivity.this, "Registro exitoso. Por favor, inicia sesión.",
+                    if (GestorUsuarios.getInstance().register(correo, pass, nombre)) {
+                        Toast.makeText(PantallaRegistro.this, "Registro exitoso. Por favor, inicia sesión.",
                                 Toast.LENGTH_SHORT).show();
 
                         finish();
                     } else {
-                        Toast.makeText(RegistroActivity.this, "El usuario ya existe.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PantallaRegistro.this, "El usuario ya existe.", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -84,3 +84,14 @@ public class RegistroActivity extends AppCompatActivity {
         });
     }
 }
+
+
+
+
+
+
+
+
+
+
+

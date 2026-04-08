@@ -12,45 +12,45 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class EntrenamientoAdapter extends RecyclerView.Adapter<EntrenamientoAdapter.ViewHolder> {
+public class InterfazListaEntrenamientos extends RecyclerView.Adapter<InterfazListaEntrenamientos.ViewHolder> {
 
     private List<Entrenamiento> entrenamientos;
-    private Context context;
+    private Context contexto;
 
     public interface OnItemLongClickListener {
-        void onItemLongClick(int position);
+        void onItemLongClick(int posicion);
     }
 
     private OnItemLongClickListener longClickListener;
 
-    public EntrenamientoAdapter(Context context, List<Entrenamiento> entrenamientos,
+    public InterfazListaEntrenamientos(Context contexto, List<Entrenamiento> entrenamientos,
             OnItemLongClickListener longClickListener) {
-        this.context = context;
+        this.contexto = contexto;
         this.entrenamientos = entrenamientos;
         this.longClickListener = longClickListener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_entrenamiento, parent, false);
-        return new ViewHolder(view);
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup padre, int viewType) {
+        View vista = LayoutInflater.from(contexto).inflate(R.layout.item_entrenamiento, padre, false);
+        return new ViewHolder(vista);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Entrenamiento entrenamiento = entrenamientos.get(position);
-        holder.tvNombre.setText("Entrenamiento del " + entrenamiento.getFecha());
+    public void onBindViewHolder(@NonNull ViewHolder filaVisor, int posicion) {
+        Entrenamiento entrenamiento = entrenamientos.get(posicion);
+        filaVisor.tvNombre.setText("Entrenamiento del " + entrenamiento.getFecha());
 
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, DetalleEntrenamientoActivity.class);
-            intent.putExtra("entrenamiento", entrenamiento);
-            context.startActivity(intent);
+        filaVisor.itemView.setOnClickListener(v -> {
+            Intent cambioPantalla = new Intent(contexto, PantallaDetalleEntrenamiento.class);
+            cambioPantalla.putExtra("entrenamiento", entrenamiento);
+            contexto.startActivity(cambioPantalla);
         });
 
-        holder.itemView.setOnLongClickListener(v -> {
+        filaVisor.itemView.setOnLongClickListener(v -> {
             if (longClickListener != null) {
-                longClickListener.onItemLongClick(position);
+                longClickListener.onItemLongClick(posicion);
             }
             return true;
         });
@@ -75,3 +75,27 @@ public class EntrenamientoAdapter extends RecyclerView.Adapter<EntrenamientoAdap
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,10 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DatabaseHelper extends SQLiteOpenHelper {
+public class GestorBaseDatos extends SQLiteOpenHelper {
 
         private static final String DATABASE_NAME = "MonfitDB";
-        private static final int DATABASE_VERSION = 8;
+        private static final int DATABASE_VERSION = 9;
 
         // Nombres de tablas
         public static final String TABLE_USUARIOS = "Usuarios";
@@ -63,8 +63,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public static final String COLUMN_LOGRO_DESCRIPCION = "descripcion";
 
         // Constructor
-        public DatabaseHelper(Context context) {
-                super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        public GestorBaseDatos(Context contexto) {
+                super(contexto, DATABASE_NAME, null, DATABASE_VERSION);
         }
 
         @Override
@@ -73,8 +73,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("CREATE TABLE Usuarios (" +
                                 "usuario_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                                 "nombre TEXT NOT NULL, " +
-                                "email TEXT UNIQUE NOT NULL, " +
-                                "password TEXT NOT NULL, " +
+                                "correo TEXT UNIQUE NOT NULL, " +
+                                "contrasena TEXT NOT NULL, " +
                                 "fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP)");
 
                 // 2. Ejercicios
@@ -160,11 +160,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("INSERT INTO Logros (titulo, descripcion) VALUES ('Bestia', 'Levanta más de 100kg')");
 
                 // Usuarios de prueba
-                db.execSQL("INSERT INTO Usuarios (nombre, email, password, fecha_registro) VALUES " +
+                db.execSQL("INSERT INTO Usuarios (nombre, correo, contrasena, fecha_registro) VALUES " +
                                 "('Mounir', 'mounir@test.com', '1234', datetime('now'))");
-                db.execSQL("INSERT INTO Usuarios (nombre, email, password, fecha_registro) VALUES " +
+                db.execSQL("INSERT INTO Usuarios (nombre, correo, contrasena, fecha_registro) VALUES " +
                                 "('Carlos', 'carlos@test.com', '1234', datetime('now'))");
-                db.execSQL("INSERT INTO Usuarios (nombre, email, password, fecha_registro) VALUES " +
+                db.execSQL("INSERT INTO Usuarios (nombre, correo, contrasena, fecha_registro) VALUES " +
                                 "('Ana', 'ana@test.com', '1234', datetime('now'))");
 
                 // Obtener semana y año actual para rankings
@@ -201,13 +201,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 // Rankings semanales actuales
                 db.execSQL("INSERT INTO Rankings_Mensuales (ejercicio_id, usuario_id, peso_maximo, semana, anio) VALUES "
                                 +
-                                "(1, 1, 85.0, " + semanaActual + ", " + anioActual + ")"); // Mounir  Press Banca
+                                "(1, 1, 85.0, " + semanaActual + ", " + anioActual + ")"); // Mounir Press Banca
                 db.execSQL("INSERT INTO Rankings_Mensuales (ejercicio_id, usuario_id, peso_maximo, semana, anio) VALUES "
                                 +
-                                "(1, 2, 90.0, " + semanaActual + ", " + anioActual + ")"); // Carlos  Press Banca
+                                "(1, 2, 90.0, " + semanaActual + ", " + anioActual + ")"); // Carlos Press Banca
                 db.execSQL("INSERT INTO Rankings_Mensuales (ejercicio_id, usuario_id, peso_maximo, semana, anio) VALUES "
                                 +
-                                "(1, 3, 70.0, " + semanaActual + ", " + anioActual + ")"); // Ana  Press Banca
+                                "(1, 3, 70.0, " + semanaActual + ", " + anioActual + ")"); // Ana Press Banca
 
                 db.execSQL("INSERT INTO Rankings_Mensuales (ejercicio_id, usuario_id, peso_maximo, semana, anio) VALUES "
                                 +
@@ -240,7 +240,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 +
                                 "('Batido proteico', 1, 180, 10.0, 25.0, 3.0)");
 
-                // Logros  para Mounir
+                // Logros para Mounir
                 db.execSQL("INSERT INTO Usuarios_Logros (usuario_id, logro_id, fecha_obtenido) VALUES " +
                                 "(1, 1, datetime('now'))");
                 db.execSQL("INSERT INTO Usuarios_Logros (usuario_id, logro_id, fecha_obtenido) VALUES " +
@@ -261,41 +261,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 onCreate(db);
         }
 
-
-
         // Usuarios
-        public boolean crearUsuario(String nombre, String email, String password) {
+        public boolean crearUsuario(String nombre, String correo, String contrasena) {
                 SQLiteDatabase db = this.getWritableDatabase();
-                if (checkEmailExists(email))
+                if (checkEmailExists(correo))
                         return false;
 
                 ContentValues values = new ContentValues();
                 values.put("nombre", nombre);
-                values.put("email", email);
-                values.put("password", password);
+                values.put("correo", correo);
+                values.put("contrasena", contrasena);
                 return db.insert("Usuarios", null, values) != -1;
         }
 
-        private boolean checkEmailExists(String email) {
+        private boolean checkEmailExists(String correo) {
                 SQLiteDatabase db = this.getReadableDatabase();
-                Cursor c = db.rawQuery("SELECT 1 FROM Usuarios WHERE email = ?", new String[] { email });
+                Cursor c = db.rawQuery("SELECT 1 FROM Usuarios WHERE correo = ?", new String[] { correo });
                 boolean exists = c.getCount() > 0;
                 c.close();
                 return exists;
         }
 
-        public boolean checkUserPassword(String email, String password) {
+        public boolean checkUserPassword(String correo, String contrasena) {
                 SQLiteDatabase db = this.getReadableDatabase();
-                Cursor c = db.rawQuery("SELECT 1 FROM Usuarios WHERE email = ? AND password = ?",
-                                new String[] { email, password });
+                Cursor c = db.rawQuery("SELECT 1 FROM Usuarios WHERE correo = ? AND contrasena = ?",
+                                new String[] { correo, contrasena });
                 boolean match = c.getCount() > 0;
                 c.close();
                 return match;
         }
 
-        public int getUserId(String email) {
+        public int getUserId(String correo) {
                 SQLiteDatabase db = this.getReadableDatabase();
-                Cursor c = db.rawQuery("SELECT usuario_id FROM Usuarios WHERE email = ?", new String[] { email });
+                Cursor c = db.rawQuery("SELECT usuario_id FROM Usuarios WHERE correo = ?", new String[] { correo });
                 if (c.moveToFirst()) {
                         int id = c.getInt(0);
                         c.close();
@@ -305,51 +303,51 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return -1;
         }
 
-        public String getUserName(String email) {
+        public String getUserName(String correo) {
                 SQLiteDatabase db = this.getReadableDatabase();
-                Cursor c = db.rawQuery("SELECT nombre FROM Usuarios WHERE email = ?", new String[] { email });
+                Cursor c = db.rawQuery("SELECT nombre FROM Usuarios WHERE correo = ?", new String[] { correo });
                 if (c.moveToFirst()) {
-                        String name = c.getString(0);
+                        String nombre = c.getString(0);
                         c.close();
-                        return name;
+                        return nombre;
                 }
                 c.close();
                 return "";
         }
 
         // PERFIL DE USUARIO
-        public Cursor getUserProfile(String email) {
+        public Cursor getUserProfile(String correo) {
                 SQLiteDatabase db = this.getReadableDatabase();
-                String query = "SELECT nombre as name, email, 0 as age, 0.0 as weight, '' as sex FROM Usuarios WHERE email = ?";
-                return db.rawQuery(query, new String[] { email });
+                String query = "SELECT nombre as nombre, correo, 0 as age, 0.0 as peso, '' as sex FROM Usuarios WHERE correo = ?";
+                return db.rawQuery(query, new String[] { correo });
         }
 
-        public boolean updateUserProfile(String email, String name, int age, double weight, String sex) {
+        public boolean updateUserProfile(String correo, String nombre, int age, double peso, String sex) {
                 SQLiteDatabase db = this.getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put("nombre", name);
-                return db.update("Usuarios", values, "email = ?", new String[] { email }) > 0;
+                values.put("nombre", nombre);
+                return db.update("Usuarios", values, "correo = ?", new String[] { correo }) > 0;
         }
 
-        public boolean updatePassword(String email, String newPassword) {
+        public boolean updatePassword(String correo, String newPassword) {
                 SQLiteDatabase db = this.getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put("password", newPassword);
-                return db.update("Usuarios", values, "email = ?", new String[] { email }) > 0;
+                values.put("contrasena", newPassword);
+                return db.update("Usuarios", values, "correo = ?", new String[] { correo }) > 0;
         }
 
-        public boolean checkUser(String email) {
-                return checkEmailExists(email);
+        public boolean checkUser(String correo) {
+                return checkEmailExists(correo);
         }
 
-        public boolean addUser(String email, String password, String name) {
-                return crearUsuario(name, email, password);
+        public boolean addUser(String correo, String contrasena, String nombre) {
+                return crearUsuario(nombre, correo, contrasena);
         }
 
         // Logros
         public Cursor getLogros(int userId) {
                 SQLiteDatabase db = this.getReadableDatabase();
-                // Devolver columnas con nombres consistentes para el adapter
+                // Devolver columnas con nombres consistentes para el miAdaptador
                 String query = "SELECT l." + COLUMN_LOGRO_ID + ", " +
                                 "l." + COLUMN_LOGRO_TITULO + ", " +
                                 "l." + COLUMN_LOGRO_DESCRIPCION + ", " +
@@ -400,11 +398,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public Cursor getAllFoods() {
                 String query = "SELECT " +
                                 COLUMN_COMIDA_ID + " as id, " +
-                                COLUMN_COMIDA_NOMBRE + " as name, " +
-                                COLUMN_CALORIAS + " as kcal, " +
-                                COLUMN_PROTEINAS + " as protein, " +
-                                COLUMN_CARBOHIDRATOS + " as carbs, " +
-                                COLUMN_GRASAS + " as fats " +
+                                COLUMN_COMIDA_NOMBRE + " as nombre, " +
+                                COLUMN_CALORIAS + " as calorias, " +
+                                COLUMN_PROTEINAS + " as proteinas, " +
+                                COLUMN_CARBOHIDRATOS + " as carbohidratos, " +
+                                COLUMN_GRASAS + " as grasas " +
                                 "FROM " + TABLE_COMIDAS;
                 return this.getReadableDatabase().rawQuery(query, null);
         }
@@ -414,46 +412,47 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return db.delete(TABLE_COMIDAS, COLUMN_COMIDA_ID + "=?", new String[] { String.valueOf(id) }) > 0;
         }
 
-        public boolean updateFood(int id, String name, int kcal, double protein, double carbs, double fats) {
+        public boolean updateFood(int id, String nombre, int calorias, double proteinas, double carbohidratos,
+                        double grasas) {
                 SQLiteDatabase db = this.getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put(COLUMN_COMIDA_NOMBRE, name);
-                values.put(COLUMN_CALORIAS, kcal);
-                values.put(COLUMN_PROTEINAS, protein);
-                values.put(COLUMN_CARBOHIDRATOS, carbs);
-                values.put(COLUMN_GRASAS, fats);
+                values.put(COLUMN_COMIDA_NOMBRE, nombre);
+                values.put(COLUMN_CALORIAS, calorias);
+                values.put(COLUMN_PROTEINAS, proteinas);
+                values.put(COLUMN_CARBOHIDRATOS, carbohidratos);
+                values.put(COLUMN_GRASAS, grasas);
                 return db.update(TABLE_COMIDAS, values, COLUMN_COMIDA_ID + "=?",
                                 new String[] { String.valueOf(id) }) > 0;
         }
 
-        public boolean addFood(String name, int kcal, double protein, double carbs, double fats) {
-                // Obtener usuario actual de UserManager
-                String userEmail = UserManager.getInstance().getCurrentUserEmail();
-                int userId = getUserId(userEmail);
+        public boolean addFood(String nombre, int calorias, double proteinas, double carbohidratos, double grasas) {
+                // Obtener usuario actual de GestorUsuarios
+                String correoUsuario = GestorUsuarios.getInstance().getCurrentUserEmail();
+                int userId = getUserId(correoUsuario);
                 if (userId == -1)
                         userId = 1; // Fallback
 
                 SQLiteDatabase db = this.getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put(COLUMN_COMIDA_NOMBRE, name);
+                values.put(COLUMN_COMIDA_NOMBRE, nombre);
                 values.put(COLUMN_COMIDA_USUARIO_ID, userId);
-                values.put(COLUMN_CALORIAS, kcal);
-                values.put(COLUMN_PROTEINAS, protein);
-                values.put(COLUMN_CARBOHIDRATOS, carbs);
-                values.put(COLUMN_GRASAS, fats);
+                values.put(COLUMN_CALORIAS, calorias);
+                values.put(COLUMN_PROTEINAS, proteinas);
+                values.put(COLUMN_CARBOHIDRATOS, carbohidratos);
+                values.put(COLUMN_GRASAS, grasas);
                 return db.insert(TABLE_COMIDAS, null, values) != -1;
         }
 
         // EJERCICIOS
-        public Cursor getExercisesByBodyPart(String bodyPart) {
+        public Cursor getExercisesByBodyPart(String parteCuerpo) {
                 SQLiteDatabase db = this.getReadableDatabase();
                 String query = "SELECT " + COLUMN_EJERCICIO_ID + " as id, " +
-                                COLUMN_EJERCICIO_NOMBRE + " as name, " +
-                                COLUMN_GRUPO_MUSCULAR + " as body_part " +
+                                COLUMN_EJERCICIO_NOMBRE + " as nombre, " +
+                                COLUMN_GRUPO_MUSCULAR + " as parte_cuerpo " +
                                 "FROM " + TABLE_EJERCICIOS;
-                if (!"Todos".equals(bodyPart)) {
+                if (!"Todos".equals(parteCuerpo)) {
                         query += " WHERE " + COLUMN_GRUPO_MUSCULAR + " = ?";
-                        return db.rawQuery(query, new String[] { bodyPart });
+                        return db.rawQuery(query, new String[] { parteCuerpo });
                 }
                 return db.rawQuery(query, null);
         }
@@ -463,38 +462,39 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return db.delete(TABLE_EJERCICIOS, COLUMN_EJERCICIO_ID + "=?", new String[] { String.valueOf(id) }) > 0;
         }
 
-        public boolean updateExercise(int id, String name, String bodyPart) {
+        public boolean updateExercise(int id, String nombre, String parteCuerpo) {
                 SQLiteDatabase db = this.getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put(COLUMN_EJERCICIO_NOMBRE, name);
-                values.put(COLUMN_GRUPO_MUSCULAR, bodyPart);
+                values.put(COLUMN_EJERCICIO_NOMBRE, nombre);
+                values.put(COLUMN_GRUPO_MUSCULAR, parteCuerpo);
                 return db.update(TABLE_EJERCICIOS, values, COLUMN_EJERCICIO_ID + "=?",
                                 new String[] { String.valueOf(id) }) > 0;
         }
 
-        public boolean addExercise(String name, String bodyPart) {
+        public boolean addExercise(String nombre, String parteCuerpo) {
                 SQLiteDatabase db = this.getWritableDatabase();
                 ContentValues values = new ContentValues();
-                values.put(COLUMN_EJERCICIO_NOMBRE, name);
-                values.put(COLUMN_GRUPO_MUSCULAR, bodyPart);
+                values.put(COLUMN_EJERCICIO_NOMBRE, nombre);
+                values.put(COLUMN_GRUPO_MUSCULAR, parteCuerpo);
                 return db.insert(TABLE_EJERCICIOS, null, values) != -1;
         }
 
         // RUTINAS / ENTRENAMIENTOS
-        public long addTraining(String date, String userEmail) {
-                int userId = getUserId(userEmail);
+        public long addTraining(String date, String correoUsuario) {
+                int userId = getUserId(correoUsuario);
                 if (userId == -1)
                         return -1;
 
                 SQLiteDatabase db = this.getWritableDatabase();
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_RUTINA_USUARIO_ID, userId);
-                values.put(COLUMN_RUTINA_NOMBRE, "Entrenamiento " + date); // Default name
+                values.put(COLUMN_RUTINA_NOMBRE, "Entrenamiento " + date); // Default nombre
                 values.put(COLUMN_RUTINA_FECHA, date); // Note: Schema expects DATETIME, generally ISO.
                 return db.insert(TABLE_RUTINAS, null, values);
         }
 
-        public boolean addTrainingDetail(long routineId, String exerciseName, int series, int reps, double weight) {
+        public boolean addTrainingDetail(long routineId, String exerciseName, int series, int repeticiones,
+                        double peso) {
 
                 int exerciseId = getExerciseIdByName(exerciseName);
                 if (exerciseId == -1)
@@ -505,15 +505,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 values.put(COLUMN_DETALLE_RUTINA_ID, routineId);
                 values.put(COLUMN_DETALLE_EJERCICIO_ID, exerciseId);
                 values.put(COLUMN_SERIES, series);
-                values.put(COLUMN_REPETICIONES, reps);
-                values.put(COLUMN_KILOS, (int) weight);
+                values.put(COLUMN_REPETICIONES, repeticiones);
+                values.put(COLUMN_KILOS, (int) peso);
                 return db.insert(TABLE_RUTINA_DETALLE, null, values) != -1;
         }
 
-        private int getExerciseIdByName(String name) {
+        private int getExerciseIdByName(String nombre) {
                 SQLiteDatabase db = this.getReadableDatabase();
                 Cursor c = db.rawQuery("SELECT " + COLUMN_EJERCICIO_ID + " FROM " + TABLE_EJERCICIOS + " WHERE "
-                                + COLUMN_EJERCICIO_NOMBRE + " = ?", new String[] { name });
+                                + COLUMN_EJERCICIO_NOMBRE + " = ?", new String[] { nombre });
                 if (c.moveToFirst()) {
                         int id = c.getInt(0);
                         c.close();
@@ -528,8 +528,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 return db.delete(TABLE_RUTINAS, COLUMN_RUTINA_ID + "=?", new String[] { String.valueOf(id) }) > 0;
         }
 
-        public Cursor getUserTrainings(String userEmail) {
-                int userId = getUserId(userEmail);
+        public Cursor getUserTrainings(String correoUsuario) {
+                int userId = getUserId(correoUsuario);
                 SQLiteDatabase db = this.getReadableDatabase();
                 return db.rawQuery(
                                 "SELECT " + COLUMN_RUTINA_ID + " as id, " + COLUMN_RUTINA_FECHA + " as date FROM "
@@ -541,7 +541,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // BÚSQUEDA DE USUARIO POR NOMBRE
         public Cursor getUserByName(String nombre) {
                 SQLiteDatabase db = this.getReadableDatabase();
-                String query = "SELECT " + COLUMN_USUARIO_ID + " as id, nombre, email FROM " + TABLE_USUARIOS +
+                String query = "SELECT " + COLUMN_USUARIO_ID + " as id, nombre, correo FROM " + TABLE_USUARIOS +
                                 " WHERE nombre LIKE ?";
                 return db.rawQuery(query, new String[] { "%" + nombre + "%" });
         }
@@ -558,10 +558,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         public Cursor getTrainingDetails(long routineId) {
                 SQLiteDatabase db = this.getReadableDatabase();
                 String query = "SELECT " +
-                                "e." + COLUMN_EJERCICIO_NOMBRE + " as exercise_name, " +
+                                "e." + COLUMN_EJERCICIO_NOMBRE + " as nombre_ejercicio, " +
                                 "rd." + COLUMN_SERIES + " as series, " +
-                                "rd." + COLUMN_REPETICIONES + " as reps, " +
-                                "rd." + COLUMN_KILOS + " as weight " +
+                                "rd." + COLUMN_REPETICIONES + " as repeticiones, " +
+                                "rd." + COLUMN_KILOS + " as peso " +
                                 "FROM " + TABLE_RUTINA_DETALLE + " rd " +
                                 "JOIN " + TABLE_EJERCICIOS + " e ON rd." + COLUMN_DETALLE_EJERCICIO_ID + " = e."
                                 + COLUMN_EJERCICIO_ID + " " +

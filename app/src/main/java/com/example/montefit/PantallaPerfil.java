@@ -3,14 +3,14 @@ package com.example.montefit;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class PerfilActivity extends AppCompatActivity {
+public class PantallaPerfil extends AppCompatActivity {
     private android.widget.TextView tvNombre, tvEmail, tvDetails;
     private com.google.android.material.button.MaterialButton btnCambiarPass, btnEditarPerfil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_perfil);
+        setContentView(R.layout.pantalla_perfil);
 
         tvNombre = findViewById(R.id.tvNombrePerfil);
         tvEmail = findViewById(R.id.tvEmailPerfil);
@@ -25,68 +25,68 @@ public class PerfilActivity extends AppCompatActivity {
     }
 
     private void loadUserData() {
-        String email = UserManager.getInstance().getCurrentUserEmail();
-        if (email != null) {
-            tvEmail.setText(email);
-            DatabaseHelper db = UserManager.getInstance().getDbHelper();
+        String correo = GestorUsuarios.getInstance().getCurrentUserEmail();
+        if (correo != null) {
+            tvEmail.setText(correo);
+            GestorBaseDatos db = GestorUsuarios.getInstance().getDbHelper();
             if (db != null) {
-                android.database.Cursor cursor = db.getUserProfile(email);
-                if (cursor != null && cursor.moveToFirst()) {
-                    String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                    int age = cursor.isNull(cursor.getColumnIndexOrThrow("age")) ? 0
-                            : cursor.getInt(cursor.getColumnIndexOrThrow("age"));
-                    double weight = cursor.isNull(cursor.getColumnIndexOrThrow("weight")) ? 0.0
-                            : cursor.getDouble(cursor.getColumnIndexOrThrow("weight"));
-                    String sex = cursor.getString(cursor.getColumnIndexOrThrow("sex"));
+                android.database.Cursor datosBD = db.getUserProfile(correo);
+                if (datosBD != null && datosBD.moveToFirst()) {
+                    String nombre = datosBD.getString(datosBD.getColumnIndexOrThrow("nombre"));
+                    int age = datosBD.isNull(datosBD.getColumnIndexOrThrow("age")) ? 0
+                            : datosBD.getInt(datosBD.getColumnIndexOrThrow("age"));
+                    double peso = datosBD.isNull(datosBD.getColumnIndexOrThrow("peso")) ? 0.0
+                            : datosBD.getDouble(datosBD.getColumnIndexOrThrow("peso"));
+                    String sex = datosBD.getString(datosBD.getColumnIndexOrThrow("sex"));
 
-                    tvNombre.setText(name != null ? name : "Sin Nombre");
+                    tvNombre.setText(nombre != null ? nombre : "Sin Nombre");
                     tvDetails.setText(
-                            String.format("Edad: %d | Peso: %.1fkg | Sexo: %s", age, weight, sex != null ? sex : "--"));
-                    cursor.close();
+                            String.format("Edad: %d | Peso: %.1fkg | Sexo: %s", age, peso, sex != null ? sex : "--"));
+                    datosBD.close();
                 }
             }
         }
     }
 
     private void mostrarDialogoEditarPerfil() {
-        String email = UserManager.getInstance().getCurrentUserEmail();
-        if (email == null)
+        String correo = GestorUsuarios.getInstance().getCurrentUserEmail();
+        if (correo == null)
             return;
-        DatabaseHelper db = UserManager.getInstance().getDbHelper();
+        GestorBaseDatos db = GestorUsuarios.getInstance().getDbHelper();
         String currentName = "";
         int currentAge = 0;
         double currentWeight = 0;
         String currentSex = "";
 
-        android.database.Cursor cursor = db.getUserProfile(email);
-        if (cursor != null && cursor.moveToFirst()) {
-            currentName = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-            if (!cursor.isNull(cursor.getColumnIndexOrThrow("age")))
-                currentAge = cursor.getInt(cursor.getColumnIndexOrThrow("age"));
-            if (!cursor.isNull(cursor.getColumnIndexOrThrow("weight")))
-                currentWeight = cursor.getDouble(cursor.getColumnIndexOrThrow("weight"));
-            currentSex = cursor.getString(cursor.getColumnIndexOrThrow("sex"));
-            cursor.close();
+        android.database.Cursor datosBD = db.getUserProfile(correo);
+        if (datosBD != null && datosBD.moveToFirst()) {
+            currentName = datosBD.getString(datosBD.getColumnIndexOrThrow("nombre"));
+            if (!datosBD.isNull(datosBD.getColumnIndexOrThrow("age")))
+                currentAge = datosBD.getInt(datosBD.getColumnIndexOrThrow("age"));
+            if (!datosBD.isNull(datosBD.getColumnIndexOrThrow("peso")))
+                currentWeight = datosBD.getDouble(datosBD.getColumnIndexOrThrow("peso"));
+            currentSex = datosBD.getString(datosBD.getColumnIndexOrThrow("sex"));
+            datosBD.close();
         }
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Editar Perfil");
+        android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
+        constructorDialogo.setTitle("Editar Perfil");
 
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(50, 40, 50, 10);
+        android.widget.LinearLayout contenedor = new android.widget.LinearLayout(this);
+        contenedor.setOrientation(android.widget.LinearLayout.VERTICAL);
+        contenedor.setPadding(50, 40, 50, 10);
 
         final android.widget.EditText inputName = new android.widget.EditText(this);
         inputName.setHint("Nombre");
         inputName.setText(currentName);
-        layout.addView(inputName);
+        contenedor.addView(inputName);
 
         final android.widget.EditText inputAge = new android.widget.EditText(this);
         inputAge.setHint("Edad");
         inputAge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         if (currentAge > 0)
             inputAge.setText(String.valueOf(currentAge));
-        layout.addView(inputAge);
+        contenedor.addView(inputAge);
 
         final android.widget.EditText inputWeight = new android.widget.EditText(this);
         inputWeight.setHint("Peso (kg)");
@@ -94,17 +94,17 @@ public class PerfilActivity extends AppCompatActivity {
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
         if (currentWeight > 0)
             inputWeight.setText(String.valueOf(currentWeight));
-        layout.addView(inputWeight);
+        contenedor.addView(inputWeight);
 
         final android.widget.EditText inputSex = new android.widget.EditText(this);
         inputSex.setHint("Sexo (Hombre/Mujer)");
         if (currentSex != null)
             inputSex.setText(currentSex);
-        layout.addView(inputSex);
+        contenedor.addView(inputSex);
 
-        builder.setView(layout);
+        constructorDialogo.setView(contenedor);
 
-        builder.setPositiveButton("Guardar", (dialog, which) -> {
+        constructorDialogo.setPositiveButton("Guardar", (miDialogo, which) -> {
             String newName = inputName.getText().toString();
             String ageStr = inputAge.getText().toString();
             String weightStr = inputWeight.getText().toString();
@@ -113,60 +113,60 @@ public class PerfilActivity extends AppCompatActivity {
             int newAge = ageStr.isEmpty() ? 0 : Integer.parseInt(ageStr);
             double newWeight = weightStr.isEmpty() ? 0 : Double.parseDouble(weightStr);
 
-            if (db.updateUserProfile(email, newName, newAge, newWeight, newSex)) {
+            if (db.updateUserProfile(correo, newName, newAge, newWeight, newSex)) {
                 android.widget.Toast.makeText(this, "Perfil actualizado", android.widget.Toast.LENGTH_SHORT).show();
                 loadUserData();
             } else {
                 android.widget.Toast.makeText(this, "Error al actualizar", android.widget.Toast.LENGTH_SHORT).show();
             }
         });
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
+        constructorDialogo.setNegativeButton("Cancelar", null);
+        constructorDialogo.show();
     }
 
     private void mostrarDialogoCambioPass() {
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle("Cambiar Contraseña");
+        android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
+        constructorDialogo.setTitle("Cambiar Contraseña");
 
-        // Layout del diálogo
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(50, 40, 50, 10);
+        // contenedor del diálogo
+        android.widget.LinearLayout contenedor = new android.widget.LinearLayout(this);
+        contenedor.setOrientation(android.widget.LinearLayout.VERTICAL);
+        contenedor.setPadding(50, 40, 50, 10);
 
         final android.widget.EditText inputCurrent = new android.widget.EditText(this);
         inputCurrent.setHint("Contraseña Actual");
         inputCurrent.setInputType(
                 android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(inputCurrent);
+        contenedor.addView(inputCurrent);
 
         final android.widget.EditText inputNew = new android.widget.EditText(this);
         inputNew.setHint("Nueva Contraseña");
         inputNew.setInputType(
                 android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        layout.addView(inputNew);
+        contenedor.addView(inputNew);
 
-        builder.setView(layout);
+        constructorDialogo.setView(contenedor);
 
-        builder.setPositiveButton("Cambiar", (dialog, which) -> {
+        constructorDialogo.setPositiveButton("Cambiar", (miDialogo, which) -> {
             String currentPass = inputCurrent.getText().toString();
             String newPass = inputNew.getText().toString();
             cambiarContrasena(currentPass, newPass);
         });
-        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.cancel());
+        constructorDialogo.setNegativeButton("Cancelar", (miDialogo, which) -> miDialogo.cancel());
 
-        builder.show();
+        constructorDialogo.show();
     }
 
     private void cambiarContrasena(String currentPass, String newPass) {
-        String email = UserManager.getInstance().getCurrentUserEmail();
-        if (email == null) {
+        String correo = GestorUsuarios.getInstance().getCurrentUserEmail();
+        if (correo == null) {
             android.widget.Toast.makeText(this, "No hay usuario logueado", android.widget.Toast.LENGTH_SHORT).show();
             return;
         }
 
-        DatabaseHelper db = UserManager.getInstance().getDbHelper();
-        if (db.checkUserPassword(email, currentPass)) {
-            if (db.updatePassword(email, newPass)) {
+        GestorBaseDatos db = GestorUsuarios.getInstance().getDbHelper();
+        if (db.checkUserPassword(correo, currentPass)) {
+            if (db.updatePassword(correo, newPass)) {
                 android.widget.Toast
                         .makeText(this, "Contraseña actualizada correctamente", android.widget.Toast.LENGTH_SHORT)
                         .show();
@@ -180,3 +180,19 @@ public class PerfilActivity extends AppCompatActivity {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

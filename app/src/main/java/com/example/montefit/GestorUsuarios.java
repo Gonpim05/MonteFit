@@ -4,70 +4,70 @@ import android.content.Context;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class UserManager {
-    private static UserManager instance;
-    private DatabaseHelper dbHelper;
-    private String currentUserEmail;
+public class GestorUsuarios {
+    private static GestorUsuarios instance;
+    private GestorBaseDatos gestorBD;
+    private String correoActual;
 
-    private UserManager() {
+    private GestorUsuarios() {
 
     }
 
-    public static synchronized UserManager getInstance() {
+    public static synchronized GestorUsuarios getInstance() {
         if (instance == null) {
-            instance = new UserManager();
+            instance = new GestorUsuarios();
         }
         return instance;
     }
 
-    public void init(Context context) {
-        if (dbHelper == null) {
-            dbHelper = new DatabaseHelper(context);
+    public void init(Context contexto) {
+        if (gestorBD == null) {
+            gestorBD = new GestorBaseDatos(contexto);
             // Ensure admin user exists for testing
-            if (!dbHelper.checkUser("admin@montefit.com")) {
+            if (!gestorBD.checkUser("admin@montefit.com")) {
                 register("admin@montefit.com", "1234", "Admin User");
             }
         }
     }
 
 
-    public boolean register(String email, String password, String name) {
-        if (dbHelper == null)
+    public boolean register(String correo, String contrasena, String nombre) {
+        if (gestorBD == null)
             return false;
-        if (dbHelper.checkUser(email)) {
+        if (gestorBD.checkUser(correo)) {
             return false;
         }
-        String hashedPassword = password;
+        String hashedPassword = contrasena;
 
 
-        return dbHelper.addUser(email, password, name);
+        return gestorBD.addUser(correo, contrasena, nombre);
     }
-    public boolean login(String email, String password) {
-        if (dbHelper == null)
+    public boolean login(String correo, String contrasena) {
+        if (gestorBD == null)
             return false;
 
-        if (dbHelper.checkUserPassword(email, password)) {
-            this.currentUserEmail = email;
+        if (gestorBD.checkUserPassword(correo, contrasena)) {
+            this.correoActual = correo;
             return true;
         }
         return false;
     }
 
     public String getCurrentUserEmail() {
-        return currentUserEmail;
+        return correoActual;
     }
 
     public void logout() {
-        currentUserEmail = null;
+        correoActual = null;
     }
 
-    public DatabaseHelper getDbHelper() {
-        return dbHelper;
+    public GestorBaseDatos getDbHelper() {
+        return gestorBD;
     }
-    private String hashPassword(String password) {
+    private String hashPassword(String contrasena) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes());
+            byte[] hash = digest.digest(contrasena.getBytes());
             StringBuilder hexString = new StringBuilder();
             for (byte b : hash) {
                 String hex = Integer.toHexString(0xff & b);
@@ -82,3 +82,13 @@ public class UserManager {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+

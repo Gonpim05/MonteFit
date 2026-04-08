@@ -3,77 +3,77 @@ package com.example.montefit;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ComidaActivity extends AppCompatActivity {
+public class PantallaComida extends AppCompatActivity {
     private androidx.recyclerview.widget.RecyclerView rvComida;
-    private com.google.android.material.floatingactionbutton.FloatingActionButton fabAdd;
-    private FoodAdapter adapter;
-    private java.util.List<Food> foodList;
-    private DatabaseHelper dbHelper;
+    private com.google.android.material.floatingactionbutton.FloatingActionButton botonAnadir;
+    private InterfazListaAlimentos miAdaptador;
+    private java.util.List<Alimento> listaAlimentos;
+    private GestorBaseDatos gestorBD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comida);
+        setContentView(R.layout.pantalla_comida);
 
         rvComida = findViewById(R.id.rvComida);
-        fabAdd = findViewById(R.id.fabAddComida);
+        botonAnadir = findViewById(R.id.fabAddComida);
         rvComida.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
 
-        dbHelper = UserManager.getInstance().getDbHelper();
-        if (dbHelper == null) {
-            UserManager.getInstance().init(this);
-            dbHelper = UserManager.getInstance().getDbHelper();
+        gestorBD = GestorUsuarios.getInstance().getDbHelper();
+        if (gestorBD == null) {
+            GestorUsuarios.getInstance().init(this);
+            gestorBD = GestorUsuarios.getInstance().getDbHelper();
         }
 
         loadFoods();
 
-        fabAdd.setOnClickListener(v -> showAddFoodDialog());
+        botonAnadir.setOnClickListener(v -> showAddFoodDialog());
     }
 
     private void loadFoods() {
-        foodList = new java.util.ArrayList<>();
-        android.database.Cursor cursor = dbHelper.getAllFoods();
-        if (cursor != null && cursor.moveToFirst()) {
+        listaAlimentos = new java.util.ArrayList<>();
+        android.database.Cursor datosBD = gestorBD.getAllFoods();
+        if (datosBD != null && datosBD.moveToFirst()) {
             do {
-                int id = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-                int kcal = cursor.getInt(cursor.getColumnIndexOrThrow("kcal"));
-                double protein = cursor.getDouble(cursor.getColumnIndexOrThrow("protein"));
-                double carbs = cursor.getDouble(cursor.getColumnIndexOrThrow("carbs"));
-                double fats = cursor.getDouble(cursor.getColumnIndexOrThrow("fats"));
-                foodList.add(new Food(id, name, kcal, protein, carbs, fats));
-            } while (cursor.moveToNext());
-            cursor.close();
+                int id = datosBD.getInt(datosBD.getColumnIndexOrThrow("id"));
+                String nombre = datosBD.getString(datosBD.getColumnIndexOrThrow("nombre"));
+                int calorias = datosBD.getInt(datosBD.getColumnIndexOrThrow("calorias"));
+                double proteinas = datosBD.getDouble(datosBD.getColumnIndexOrThrow("proteinas"));
+                double carbohidratos = datosBD.getDouble(datosBD.getColumnIndexOrThrow("carbohidratos"));
+                double grasas = datosBD.getDouble(datosBD.getColumnIndexOrThrow("grasas"));
+                listaAlimentos.add(new Alimento(id, nombre, calorias, proteinas, carbohidratos, grasas));
+            } while (datosBD.moveToNext());
+            datosBD.close();
         }
 
-        if (adapter == null) {
-            adapter = new FoodAdapter(foodList, this::showOptionsDialog);
-            rvComida.setAdapter(adapter);
+        if (miAdaptador == null) {
+            miAdaptador = new InterfazListaAlimentos(listaAlimentos, this::showOptionsDialog);
+            rvComida.setAdapter(miAdaptador);
         } else {
-            adapter.updateList(foodList);
+            miAdaptador.updateList(listaAlimentos);
         }
     }
 
-    private void showOptionsDialog(Food food) {
+    private void showOptionsDialog(Alimento Alimento) {
         String[] options = { "Editar", "Eliminar" };
         new android.app.AlertDialog.Builder(this)
-                .setTitle(food.getName())
-                .setItems(options, (dialog, which) -> {
+                .setTitle(Alimento.getName())
+                .setItems(options, (miDialogo, which) -> {
                     if (which == 0) {
-                        showAddFoodDialog(food); // Reuse dialog for editing
+                        showAddFoodDialog(Alimento); // Reuse miDialogo for editing
                     } else if (which == 1) {
-                        confirmDelete(food);
+                        confirmDelete(Alimento);
                     }
                 })
                 .show();
     }
 
-    private void confirmDelete(Food food) {
+    private void confirmDelete(Alimento Alimento) {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("Eliminar " + food.getName())
+                .setTitle("Eliminar " + Alimento.getName())
                 .setMessage("¿Estás seguro?")
-                .setPositiveButton("Sí", (dialog, which) -> {
-                    if (dbHelper.deleteFood(food.getId())) {
+                .setPositiveButton("Sí", (miDialogo, which) -> {
+                    if (gestorBD.deleteFood(Alimento.getId())) {
                         android.widget.Toast.makeText(this, "Eliminado", android.widget.Toast.LENGTH_SHORT).show();
                         loadFoods();
                     }
@@ -86,27 +86,27 @@ public class ComidaActivity extends AppCompatActivity {
         showAddFoodDialog(null);
     }
 
-    private void showAddFoodDialog(Food foodToEdit) {
+    private void showAddFoodDialog(Alimento foodToEdit) {
         boolean isEditing = (foodToEdit != null);
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle(isEditing ? "Editar Comida" : "Añadir Comida");
+        android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
+        constructorDialogo.setTitle(isEditing ? "Editar Comida" : "Añadir Comida");
 
-        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
-        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
-        layout.setPadding(50, 20, 50, 10);
+        android.widget.LinearLayout contenedor = new android.widget.LinearLayout(this);
+        contenedor.setOrientation(android.widget.LinearLayout.VERTICAL);
+        contenedor.setPadding(50, 20, 50, 10);
 
         final android.widget.EditText inputName = new android.widget.EditText(this);
         inputName.setHint("Nombre");
         if (isEditing)
             inputName.setText(foodToEdit.getName());
-        layout.addView(inputName);
+        contenedor.addView(inputName);
 
         final android.widget.EditText inputKcal = new android.widget.EditText(this);
-        inputKcal.setHint("Kcal");
+        inputKcal.setHint("calorias");
         inputKcal.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
         if (isEditing)
             inputKcal.setText(String.valueOf(foodToEdit.getKcal()));
-        layout.addView(inputKcal);
+        contenedor.addView(inputKcal);
 
         final android.widget.EditText inputProtein = new android.widget.EditText(this);
         inputProtein.setHint("Proteínas (g)");
@@ -114,7 +114,7 @@ public class ComidaActivity extends AppCompatActivity {
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
         if (isEditing)
             inputProtein.setText(String.valueOf(foodToEdit.getProtein()));
-        layout.addView(inputProtein);
+        contenedor.addView(inputProtein);
 
         final android.widget.EditText inputCarbs = new android.widget.EditText(this);
         inputCarbs.setHint("Carbohidratos (g)");
@@ -122,7 +122,7 @@ public class ComidaActivity extends AppCompatActivity {
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
         if (isEditing)
             inputCarbs.setText(String.valueOf(foodToEdit.getCarbs()));
-        layout.addView(inputCarbs);
+        contenedor.addView(inputCarbs);
 
         final android.widget.EditText inputFats = new android.widget.EditText(this);
         inputFats.setHint("Grasas (g)");
@@ -130,25 +130,25 @@ public class ComidaActivity extends AppCompatActivity {
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
         if (isEditing)
             inputFats.setText(String.valueOf(foodToEdit.getFats()));
-        layout.addView(inputFats);
+        contenedor.addView(inputFats);
 
-        builder.setView(layout);
+        constructorDialogo.setView(contenedor);
 
-        builder.setPositiveButton("Guardar", (dialog, which) -> {
+        constructorDialogo.setPositiveButton("Guardar", (miDialogo, which) -> {
             try {
-                String name = inputName.getText().toString();
-                if (name.isEmpty()) {
+                String nombre = inputName.getText().toString();
+                if (nombre.isEmpty()) {
                     android.widget.Toast.makeText(this, "El nombre es obligatorio", android.widget.Toast.LENGTH_SHORT)
                             .show();
                     return;
                 }
-                int kcal = Integer.parseInt(inputKcal.getText().toString());
-                double protein = Double.parseDouble(inputProtein.getText().toString());
-                double carbs = Double.parseDouble(inputCarbs.getText().toString());
-                double fats = Double.parseDouble(inputFats.getText().toString());
+                int calorias = Integer.parseInt(inputKcal.getText().toString());
+                double proteinas = Double.parseDouble(inputProtein.getText().toString());
+                double carbohidratos = Double.parseDouble(inputCarbs.getText().toString());
+                double grasas = Double.parseDouble(inputFats.getText().toString());
 
                 if (isEditing) {
-                    if (dbHelper.updateFood(foodToEdit.getId(), name, kcal, protein, carbs, fats)) {
+                    if (gestorBD.updateFood(foodToEdit.getId(), nombre, calorias, proteinas, carbohidratos, grasas)) {
                         android.widget.Toast.makeText(this, "Actualizado", android.widget.Toast.LENGTH_SHORT).show();
                         loadFoods();
                     } else {
@@ -156,7 +156,7 @@ public class ComidaActivity extends AppCompatActivity {
                                 .show();
                     }
                 } else {
-                    if (dbHelper.addFood(name, kcal, protein, carbs, fats)) {
+                    if (gestorBD.addFood(nombre, calorias, proteinas, carbohidratos, grasas)) {
                         android.widget.Toast.makeText(this, "Guardado", android.widget.Toast.LENGTH_SHORT).show();
                         loadFoods();
                     } else {
@@ -169,8 +169,33 @@ public class ComidaActivity extends AppCompatActivity {
                         .show();
             }
         });
-        builder.setNegativeButton("Cancelar", null);
+        constructorDialogo.setNegativeButton("Cancelar", null);
 
-        builder.show();
+        constructorDialogo.show();
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

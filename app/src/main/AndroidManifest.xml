@@ -14,7 +14,7 @@
 
 
         <activity
-            android:name=".MainActivity"
+            android:name=".PantallaPrincipal"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,17 +23,25 @@
         </activity>
 
         <activity
-            android:name=".RegistroActivity"
+            android:name=".PantallaRegistro"
             android:exported="false" />
 
-        <activity android:name=".PantallaInicialActivity" android:exported="false"/>
-        <activity android:name=".EntrenarActivity" android:exported="false"/>
-        <activity android:name=".ComidaActivity" android:exported="false"/>
-        <activity android:name=".PerfilActivity" android:exported="false"/>
-        <activity android:name=".DetalleEntrenamientoActivity" android:exported="false"/>
-        <activity android:name=".LogrosActivity" android:exported="false"/>
-        <activity android:name=".SocialActivity" android:exported="false"/>
+        <activity android:name=".PantallaInicial" android:exported="false"/>
+        <activity android:name=".PantallaEntrenar" android:exported="false"/>
+        <activity android:name=".PantallaComida" android:exported="false"/>
+        <activity android:name=".PantallaPerfil" android:exported="false"/>
+        <activity android:name=".PantallaDetalleEntrenamiento" android:exported="false"/>
+        <activity android:name=".PantallaLogros" android:exported="false"/>
+        <activity android:name=".PantallaSocial" android:exported="false"/>
 
     </application>
 
 </manifest>
+
+
+
+
+
+
+
+

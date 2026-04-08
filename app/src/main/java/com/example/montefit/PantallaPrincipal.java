@@ -13,14 +13,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class MainActivity extends AppCompatActivity {
+public class PantallaPrincipal extends AppCompatActivity {
     private EditText etCorreo, etContrasena;
     private Button btnLoguear, btnIrARegistro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        UserManager.getInstance().init(this);
+        GestorUsuarios.getInstance().init(this);
         EdgeToEdge.enable(this);
         setContentView(R.layout.layout_login);
         View mainView = findViewById(R.id.main);
@@ -38,20 +38,20 @@ public class MainActivity extends AppCompatActivity {
         btnLoguear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = etCorreo.getText().toString().trim();
-                String password = etContrasena.getText().toString().trim();
+                String correo = etCorreo.getText().toString().trim();
+                String contrasena = etContrasena.getText().toString().trim();
 
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT)
+                if (correo.isEmpty() || contrasena.isEmpty()) {
+                    Toast.makeText(PantallaPrincipal.this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT)
                             .show();
                 } else {
-                    if (UserManager.getInstance().login(email, password)) {
-                        Toast.makeText(MainActivity.this, "Bienvenido " + email, Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(MainActivity.this, PantallaInicialActivity.class);
-                        startActivity(intent);
+                    if (GestorUsuarios.getInstance().login(correo, contrasena)) {
+                        Toast.makeText(PantallaPrincipal.this, "Bienvenido " + correo, Toast.LENGTH_SHORT).show();
+                        Intent cambioPantalla = new Intent(PantallaPrincipal.this, PantallaInicial.class);
+                        startActivity(cambioPantalla);
                         finish();
                     } else {
-                        Toast.makeText(MainActivity.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PantallaPrincipal.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -59,9 +59,27 @@ public class MainActivity extends AppCompatActivity {
         btnIrARegistro.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, RegistroActivity.class);
-                startActivity(intent);
+                Intent cambioPantalla = new Intent(PantallaPrincipal.this, PantallaRegistro.class);
+                startActivity(cambioPantalla);
             }
         });
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -15,13 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PantallaInicialActivity extends AppCompatActivity {
+public class PantallaInicial extends AppCompatActivity {
 
         private Button btnEntrenar, btnComida, btnPerfil, btnLogros, btnSocial;
         private RecyclerView rvEntrenamientos;
-        private EntrenamientoAdapter adapter;
+        private InterfazListaEntrenamientos miAdaptador;
         private List<Entrenamiento> listaEntrenamientos;
-        private DatabaseHelper dbHelper;
+        private GestorBaseDatos gestorBD;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -29,10 +29,10 @@ public class PantallaInicialActivity extends AppCompatActivity {
                 EdgeToEdge.enable(this);
                 setContentView(R.layout.pantalla_inicial);
 
-                dbHelper = UserManager.getInstance().getDbHelper();
-                if (dbHelper == null) {
-                        UserManager.getInstance().init(this);
-                        dbHelper = UserManager.getInstance().getDbHelper();
+                gestorBD = GestorUsuarios.getInstance().getDbHelper();
+                if (gestorBD == null) {
+                        GestorUsuarios.getInstance().init(this);
+                        gestorBD = GestorUsuarios.getInstance().getDbHelper();
                 }
                 btnEntrenar = findViewById(R.id.btnEntrenar);
                 btnComida = findViewById(R.id.btnComida);
@@ -42,30 +42,30 @@ public class PantallaInicialActivity extends AppCompatActivity {
                 rvEntrenamientos = findViewById(R.id.rvEntrenamientos);
                 rvEntrenamientos.setLayoutManager(new LinearLayoutManager(this));
                 listaEntrenamientos = new ArrayList<>();
-                adapter = new EntrenamientoAdapter(this, listaEntrenamientos, position -> {
-                        showDeleteWorkoutDialog(position);
+                miAdaptador = new InterfazListaEntrenamientos(this, listaEntrenamientos, posicion -> {
+                        showDeleteWorkoutDialog(posicion);
                 });
-                rvEntrenamientos.setAdapter(adapter);
+                rvEntrenamientos.setAdapter(miAdaptador);
 
                 // Set Listeners
                 btnEntrenar.setOnClickListener(
-                                v -> startActivity(new Intent(PantallaInicialActivity.this, EntrenarActivity.class)));
+                                v -> startActivity(new Intent(PantallaInicial.this, PantallaEntrenar.class)));
 
                 btnComida
                                 .setOnClickListener(v -> startActivity(
-                                                new Intent(PantallaInicialActivity.this, ComidaActivity.class)));
+                                                new Intent(PantallaInicial.this, PantallaComida.class)));
 
                 btnPerfil
                                 .setOnClickListener(v -> startActivity(
-                                                new Intent(PantallaInicialActivity.this, PerfilActivity.class)));
+                                                new Intent(PantallaInicial.this, PantallaPerfil.class)));
 
                 btnLogros
                                 .setOnClickListener(v -> startActivity(
-                                                new Intent(PantallaInicialActivity.this, LogrosActivity.class)));
+                                                new Intent(PantallaInicial.this, PantallaLogros.class)));
 
                 btnSocial
                                 .setOnClickListener(v -> startActivity(
-                                                new Intent(PantallaInicialActivity.this, SocialActivity.class)));
+                                                new Intent(PantallaInicial.this, PantallaSocial.class)));
         }
 
         @Override
@@ -75,56 +75,56 @@ public class PantallaInicialActivity extends AppCompatActivity {
         }
 
         private void loadWorkouts() {
-                String email = UserManager.getInstance().getCurrentUserEmail();
-                if (email == null)
+                String correo = GestorUsuarios.getInstance().getCurrentUserEmail();
+                if (correo == null)
                         return;
 
                 listaEntrenamientos.clear();
-                Cursor cursor = dbHelper.getUserTrainings(email);
-                if (cursor != null && cursor.moveToFirst()) {
+                Cursor datosBD = gestorBD.getUserTrainings(correo);
+                if (datosBD != null && datosBD.moveToFirst()) {
                         do {
-                                long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
-                                String date = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                                long id = datosBD.getLong(datosBD.getColumnIndexOrThrow("id"));
+                                String date = datosBD.getString(datosBD.getColumnIndexOrThrow("date"));
                                 List<Entrenamiento.EjercicioDetalle> ejerciciosDetalle = new ArrayList<>();
-                                Cursor detailCursor = dbHelper.getTrainingDetails(id);
+                                Cursor detailCursor = gestorBD.getTrainingDetails(id);
                                 if (detailCursor != null && detailCursor.moveToFirst()) {
                                         do {
-                                                String name = detailCursor.getString(
-                                                                detailCursor.getColumnIndexOrThrow("exercise_name"));
+                                                String nombre = detailCursor.getString(
+                                                                detailCursor.getColumnIndexOrThrow("nombre_ejercicio"));
                                                 int series = detailCursor
                                                                 .getInt(detailCursor.getColumnIndexOrThrow("series"));
-                                                double weight = detailCursor.getDouble(
-                                                                detailCursor.getColumnIndexOrThrow("weight"));
+                                                double peso = detailCursor.getDouble(
+                                                                detailCursor.getColumnIndexOrThrow("peso"));
                                                 boolean found = false;
                                                 for (Entrenamiento.EjercicioDetalle ed : ejerciciosDetalle) {
-                                                        if (ed.nombre.equals(name) && ed.peso == weight) {
+                                                        if (ed.nombre.equals(nombre) && ed.peso == peso) {
                                                                 ed.series += series;
                                                                 found = true;
                                                                 break;
                                                         }
                                                 }
                                                 if (!found) {
-                                                        ejerciciosDetalle.add(new Entrenamiento.EjercicioDetalle(name,
-                                                                        series, weight));
+                                                        ejerciciosDetalle.add(new Entrenamiento.EjercicioDetalle(nombre,
+                                                                        series, peso));
                                                 }
                                         } while (detailCursor.moveToNext());
                                         detailCursor.close();
                                 }
 
                                 listaEntrenamientos.add(new Entrenamiento(id, date, ejerciciosDetalle));
-                        } while (cursor.moveToNext());
-                        cursor.close();
+                        } while (datosBD.moveToNext());
+                        datosBD.close();
                 }
-                adapter.notifyDataSetChanged();
+                miAdaptador.notifyDataSetChanged();
         }
 
-        private void showDeleteWorkoutDialog(int position) {
-                Entrenamiento e = listaEntrenamientos.get(position);
+        private void showDeleteWorkoutDialog(int posicion) {
+                Entrenamiento e = listaEntrenamientos.get(posicion);
                 new AlertDialog.Builder(this)
                                 .setTitle("Eliminar entrenamiento")
                                 .setMessage("¿Estás seguro de que quieres eliminar este entrenamiento?")
-                                .setPositiveButton("Eliminar", (dialog, which) -> {
-                                        if (dbHelper.deleteTraining(e.getId())) {
+                                .setPositiveButton("Eliminar", (miDialogo, which) -> {
+                                        if (gestorBD.deleteTraining(e.getId())) {
                                                 Toast.makeText(this, "Entrenamiento eliminado", Toast.LENGTH_SHORT)
                                                                 .show();
                                                 loadWorkouts();
@@ -136,3 +136,34 @@ public class PantallaInicialActivity extends AppCompatActivity {
                                 .show();
         }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

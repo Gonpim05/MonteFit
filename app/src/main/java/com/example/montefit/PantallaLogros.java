@@ -7,34 +7,34 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class LogrosActivity extends AppCompatActivity {
+public class PantallaLogros extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private DatabaseHelper dbHelper;
+    private GestorBaseDatos gestorBD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_logros);
+        setContentView(R.layout.pantalla_logros);
 
-        dbHelper = UserManager.getInstance().getDbHelper();
-        if (dbHelper == null) {
-            UserManager.getInstance().init(this);
-            dbHelper = UserManager.getInstance().getDbHelper();
+        gestorBD = GestorUsuarios.getInstance().getDbHelper();
+        if (gestorBD == null) {
+            GestorUsuarios.getInstance().init(this);
+            gestorBD = GestorUsuarios.getInstance().getDbHelper();
         }
 
         recyclerView = findViewById(R.id.recyclerLogros);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Get ID of current user
-        String userEmail = UserManager.getInstance().getCurrentUserEmail();
-        if (userEmail == null || userEmail.isEmpty()) {
+        String correoUsuario = GestorUsuarios.getInstance().getCurrentUserEmail();
+        if (correoUsuario == null || correoUsuario.isEmpty()) {
             Toast.makeText(this, "No hay usuario logueado", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
-        int userId = dbHelper.getUserId(userEmail);
+        int userId = gestorBD.getUserId(correoUsuario);
         if (userId != -1) {
             loadAchievements(userId);
         } else {
@@ -44,12 +44,27 @@ public class LogrosActivity extends AppCompatActivity {
     }
 
     private void loadAchievements(int userId) {
-        Cursor cursor = dbHelper.getLogros(userId);
-        if (cursor != null && cursor.getCount() > 0) {
-            LogrosAdapter adapter = new LogrosAdapter(this, cursor);
-            recyclerView.setAdapter(adapter);
+        Cursor datosBD = gestorBD.getLogros(userId);
+        if (datosBD != null && datosBD.getCount() > 0) {
+            InterfazListaLogros miAdaptador = new InterfazListaLogros(this, datosBD);
+            recyclerView.setAdapter(miAdaptador);
         } else {
             Toast.makeText(this, "No hay logros disponibles", Toast.LENGTH_SHORT).show();
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
