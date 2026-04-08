@@ -4,16 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@android:color/white">
+    android:fitsSystemWindows="true"
+    android:background="?android:attr/colorBackground">
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:gravity="center"
         android:text="Mis Logros"
-        android:textColor="@android:color/black"
-        android:textSize="24sp"
+        android:textColor="@color/accent_gold"
+        android:textSize="26sp"
         android:textStyle="bold" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -22,15 +24,3 @@
         android:layout_height="match_parent" />
 
 </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
-

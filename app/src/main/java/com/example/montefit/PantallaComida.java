@@ -1,23 +1,27 @@
 package com.example.montefit;
 
+import android.database.Cursor;
 import android.os.Bundle;
+import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import java.util.List;
 
-public class PantallaComida extends AppCompatActivity {
-    private androidx.recyclerview.widget.RecyclerView rvComida;
-    private com.google.android.material.floatingactionbutton.FloatingActionButton botonAnadir;
+public class PantallaComida extends AppCompatActivity implements InterfazListaAlimentos.OnFoodClickListener {
+
+    private RecyclerView recyclerView;
     private InterfazListaAlimentos miAdaptador;
-    private java.util.List<Alimento> listaAlimentos;
+    private List<Alimento> listaAlimentos;
     private GestorBaseDatos gestorBD;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.pantalla_comida);
-
-        rvComida = findViewById(R.id.rvComida);
-        botonAnadir = findViewById(R.id.fabAddComida);
-        rvComida.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(this));
 
         gestorBD = GestorUsuarios.getInstance().getDbHelper();
         if (gestorBD == null) {
@@ -25,14 +29,20 @@ public class PantallaComida extends AppCompatActivity {
             gestorBD = GestorUsuarios.getInstance().getDbHelper();
         }
 
-        loadFoods();
+        recyclerView = findViewById(R.id.rvComida);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        listaAlimentos = new ArrayList<>();
+        miAdaptador = new InterfazListaAlimentos(listaAlimentos, this);
+        recyclerView.setAdapter(miAdaptador);
 
-        botonAnadir.setOnClickListener(v -> showAddFoodDialog());
+        findViewById(R.id.fabAddComida).setOnClickListener(v -> showAddFoodDialog(null));
+
+        loadFoods();
     }
 
     private void loadFoods() {
-        listaAlimentos = new java.util.ArrayList<>();
-        android.database.Cursor datosBD = gestorBD.getAllFoods();
+        listaAlimentos.clear();
+        Cursor datosBD = gestorBD.getAllFoods();
         if (datosBD != null && datosBD.moveToFirst()) {
             do {
                 int id = datosBD.getInt(datosBD.getColumnIndexOrThrow("id"));
@@ -45,157 +55,120 @@ public class PantallaComida extends AppCompatActivity {
             } while (datosBD.moveToNext());
             datosBD.close();
         }
-
-        if (miAdaptador == null) {
-            miAdaptador = new InterfazListaAlimentos(listaAlimentos, this::showOptionsDialog);
-            rvComida.setAdapter(miAdaptador);
-        } else {
-            miAdaptador.updateList(listaAlimentos);
-        }
+        miAdaptador.notifyDataSetChanged();
     }
 
-    private void showOptionsDialog(Alimento Alimento) {
-        String[] options = { "Editar", "Eliminar" };
+    @Override
+    public void onDeleteClick(Alimento Alimento) {
+        showFoodOptionsDialog(Alimento);
+    }
+
+    private void showFoodOptionsDialog(Alimento Alimento) {
+        String[] opciones = { "Editar", "Eliminar" };
         new android.app.AlertDialog.Builder(this)
                 .setTitle(Alimento.getName())
-                .setItems(options, (miDialogo, which) -> {
+                .setItems(opciones, (miDialogo, which) -> {
                     if (which == 0) {
-                        showAddFoodDialog(Alimento); // Reuse miDialogo for editing
-                    } else if (which == 1) {
-                        confirmDelete(Alimento);
+                        showAddFoodDialog(Alimento);
+                    } else {
+                        new android.app.AlertDialog.Builder(this)
+                                .setTitle("Eliminar " + Alimento.getName() + "?")
+                                .setPositiveButton("Sí", (d, w) -> {
+                                    if (gestorBD.deleteFood(Alimento.getId())) {
+                                        Toast.makeText(this, "Eliminado", Toast.LENGTH_SHORT).show();
+                                        loadFoods();
+                                    }
+                                })
+                                .setNegativeButton("No", null)
+                                .show();
                     }
                 })
                 .show();
     }
 
-    private void confirmDelete(Alimento Alimento) {
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Eliminar " + Alimento.getName())
-                .setMessage("¿Estás seguro?")
-                .setPositiveButton("Sí", (miDialogo, which) -> {
-                    if (gestorBD.deleteFood(Alimento.getId())) {
-                        android.widget.Toast.makeText(this, "Eliminado", android.widget.Toast.LENGTH_SHORT).show();
-                        loadFoods();
-                    }
-                })
-                .setNegativeButton("No", null)
-                .show();
-    }
-
-    private void showAddFoodDialog() {
-        showAddFoodDialog(null);
-    }
-
-    private void showAddFoodDialog(Alimento foodToEdit) {
-        boolean isEditing = (foodToEdit != null);
+    private void showAddFoodDialog(Alimento existente) {
+        boolean editing = existente != null;
         android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
-        constructorDialogo.setTitle(isEditing ? "Editar Comida" : "Añadir Comida");
+        constructorDialogo.setTitle(editing ? "Editar Comida" : "Añadir Comida");
 
         android.widget.LinearLayout contenedor = new android.widget.LinearLayout(this);
         contenedor.setOrientation(android.widget.LinearLayout.VERTICAL);
-        contenedor.setPadding(50, 20, 50, 10);
+        contenedor.setPadding(50, 30, 50, 10);
 
         final android.widget.EditText inputName = new android.widget.EditText(this);
         inputName.setHint("Nombre");
-        if (isEditing)
-            inputName.setText(foodToEdit.getName());
+        inputName.setTextColor(android.graphics.Color.WHITE);
+        inputName.setHintTextColor(android.graphics.Color.LTGRAY);
+        if (editing)
+            inputName.setText(existente.getName());
         contenedor.addView(inputName);
 
         final android.widget.EditText inputKcal = new android.widget.EditText(this);
-        inputKcal.setHint("calorias");
+        inputKcal.setHint("Calorías");
+        inputKcal.setTextColor(android.graphics.Color.WHITE);
+        inputKcal.setHintTextColor(android.graphics.Color.LTGRAY);
         inputKcal.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        if (isEditing)
-            inputKcal.setText(String.valueOf(foodToEdit.getKcal()));
+        if (editing)
+            inputKcal.setText(String.valueOf(existente.getKcal()));
         contenedor.addView(inputKcal);
 
-        final android.widget.EditText inputProtein = new android.widget.EditText(this);
-        inputProtein.setHint("Proteínas (g)");
-        inputProtein.setInputType(
+        final android.widget.EditText inputProt = new android.widget.EditText(this);
+        inputProt.setHint("Proteínas (g)");
+        inputProt.setTextColor(android.graphics.Color.WHITE);
+        inputProt.setHintTextColor(android.graphics.Color.LTGRAY);
+        inputProt.setInputType(
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        if (isEditing)
-            inputProtein.setText(String.valueOf(foodToEdit.getProtein()));
-        contenedor.addView(inputProtein);
+        if (editing)
+            inputProt.setText(String.valueOf(existente.getProtein()));
+        contenedor.addView(inputProt);
 
-        final android.widget.EditText inputCarbs = new android.widget.EditText(this);
-        inputCarbs.setHint("Carbohidratos (g)");
-        inputCarbs.setInputType(
+        final android.widget.EditText inputCarb = new android.widget.EditText(this);
+        inputCarb.setHint("Carbohidratos (g)");
+        inputCarb.setTextColor(android.graphics.Color.WHITE);
+        inputCarb.setHintTextColor(android.graphics.Color.LTGRAY);
+        inputCarb.setInputType(
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        if (isEditing)
-            inputCarbs.setText(String.valueOf(foodToEdit.getCarbs()));
-        contenedor.addView(inputCarbs);
+        if (editing)
+            inputCarb.setText(String.valueOf(existente.getCarbs()));
+        contenedor.addView(inputCarb);
 
-        final android.widget.EditText inputFats = new android.widget.EditText(this);
-        inputFats.setHint("Grasas (g)");
-        inputFats.setInputType(
+        final android.widget.EditText inputFat = new android.widget.EditText(this);
+        inputFat.setHint("Grasas (g)");
+        inputFat.setTextColor(android.graphics.Color.WHITE);
+        inputFat.setHintTextColor(android.graphics.Color.LTGRAY);
+        inputFat.setInputType(
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        if (isEditing)
-            inputFats.setText(String.valueOf(foodToEdit.getFats()));
-        contenedor.addView(inputFats);
+        if (editing)
+            inputFat.setText(String.valueOf(existente.getFats()));
+        contenedor.addView(inputFat);
 
         constructorDialogo.setView(contenedor);
-
         constructorDialogo.setPositiveButton("Guardar", (miDialogo, which) -> {
             try {
                 String nombre = inputName.getText().toString();
-                if (nombre.isEmpty()) {
-                    android.widget.Toast.makeText(this, "El nombre es obligatorio", android.widget.Toast.LENGTH_SHORT)
-                            .show();
-                    return;
-                }
-                int calorias = Integer.parseInt(inputKcal.getText().toString());
-                double proteinas = Double.parseDouble(inputProtein.getText().toString());
-                double carbohidratos = Double.parseDouble(inputCarbs.getText().toString());
-                double grasas = Double.parseDouble(inputFats.getText().toString());
+                int kcal = Integer.parseInt(inputKcal.getText().toString());
+                double prot = Double.parseDouble(inputProt.getText().toString());
+                double carb = Double.parseDouble(inputCarb.getText().toString());
+                double fat = Double.parseDouble(inputFat.getText().toString());
 
-                if (isEditing) {
-                    if (gestorBD.updateFood(foodToEdit.getId(), nombre, calorias, proteinas, carbohidratos, grasas)) {
-                        android.widget.Toast.makeText(this, "Actualizado", android.widget.Toast.LENGTH_SHORT).show();
-                        loadFoods();
-                    } else {
-                        android.widget.Toast.makeText(this, "Error al actualizar", android.widget.Toast.LENGTH_SHORT)
-                                .show();
-                    }
+                boolean ok;
+                if (editing) {
+                    ok = gestorBD.updateFood(existente.getId(), nombre, kcal, prot, carb, fat);
                 } else {
-                    if (gestorBD.addFood(nombre, calorias, proteinas, carbohidratos, grasas)) {
-                        android.widget.Toast.makeText(this, "Guardado", android.widget.Toast.LENGTH_SHORT).show();
-                        loadFoods();
-                    } else {
-                        android.widget.Toast.makeText(this, "Error al guardar", android.widget.Toast.LENGTH_SHORT)
-                                .show();
-                    }
+                    ok = gestorBD.addFood(nombre, kcal, prot, carb, fat);
                 }
-            } catch (NumberFormatException e) {
-                android.widget.Toast.makeText(this, "Datos numéricos inválidos", android.widget.Toast.LENGTH_SHORT)
-                        .show();
+
+                if (ok) {
+                    Toast.makeText(this, editing ? "Actualizado" : "Comida añadida", Toast.LENGTH_SHORT).show();
+                    loadFoods();
+                } else {
+                    Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+                }
+            } catch (Exception e) {
+                Toast.makeText(this, "Datos inválidos", Toast.LENGTH_SHORT).show();
             }
         });
         constructorDialogo.setNegativeButton("Cancelar", null);
-
         constructorDialogo.show();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,31 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="?android:attr/colorBackground">
 
-    android:background="@color/background_light">
-
-    <!-- Header / Cabecera -->
-
+    <!-- Header -->
     <View
         android:id="@+id/headerBackground"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="140dp"
         android:background="@color/primary_fitness"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Lista de Entrenamientos -->
-
     <TextView
         android:id="@+id/tvTituloMfit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="36dp"
         android:text="MONTE FIT"
-        android:textColor="@color/white"
-        android:textSize="24sp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,23 +34,39 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="8dp"
         android:text="Tus últimos entrenamientos"
-        android:textColor="@color/white"
+        android:textColor="@color/text_secondary"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTituloMfit" />
 
+    <!-- Botón Perfil -->
+    <Button
+        android:id="@+id/btnPerfil"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/boton_secundario"
+        android:text="Perfil"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="12sp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Lista de Entrenamientos -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEntrenamientos"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.75" />
+        app:layout_constraintGuide_percent="0.72" />
 
     <!-- Fila Superior de Botones -->
     <LinearLayout
@@ -73,30 +86,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/guidelineBottom">
 
         <Button
-            android:id="@+id/btnLogros"
+            android:id="@+id/btnEntrenar"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="6dp"
             android:background="@drawable/boton_redondeado"
-            android:text="Logros"
-            android:textColor="@color/white" />
+            android:text="💪 Entrenar"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btnSocial"
+            android:id="@+id/btnComida"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/boton_redondeado"
-            android:text="Social"
-            android:textColor="@color/white" />
+            android:layout_marginStart="6dp"
+            android:background="@drawable/boton_secundario"
+            android:text="🍗 Comida"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Fila Inferior de Botones -->
@@ -105,54 +122,34 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:layout_marginTop="12dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintTop_toBottomOf="@+id/buttonRow1">
 
         <Button
-            android:id="@+id/btnComida"
+            android:id="@+id/btnLogros"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            android:background="@drawable/boton_redondeado"
-            android:text="Comida"
-            android:textColor="@color/white" />
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/boton_secundario"
+            android:text="🏆 Logros"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btnEntrenar"
+            android:id="@+id/btnSocial"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
             android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/boton_redondeado"
-            android:text="Entrenar"
-            android:textColor="@color/white" />
+            android:layout_marginStart="6dp"
+            android:background="@drawable/boton_secundario"
+            android:text="📊 Social"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnPerfil"
-        android:layout_width="wrap_content"
-        android:layout_height="35dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/boton_redondeado"
-        android:text="Perfil"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
-
-
-
-
-

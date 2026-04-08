@@ -19,6 +19,8 @@ public class PantallaPrincipal extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // Aplicar tema antes de onCreate
+        PreferenciasApp.applyTheme(PreferenciasApp.getThemeMode(this));
         super.onCreate(savedInstanceState);
         GestorUsuarios.getInstance().init(this);
         EdgeToEdge.enable(this);

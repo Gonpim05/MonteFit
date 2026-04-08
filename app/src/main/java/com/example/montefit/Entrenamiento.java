@@ -7,6 +7,7 @@ public class Entrenamiento implements Serializable {
     private long id;
     private String fecha;
     private List<EjercicioDetalle> ejercicios;
+    private boolean esPublico;
 
     public static class EjercicioDetalle implements Serializable {
         public String nombre;
@@ -21,9 +22,14 @@ public class Entrenamiento implements Serializable {
     }
 
     public Entrenamiento(long id, String fecha, List<EjercicioDetalle> ejercicios) {
+        this(id, fecha, ejercicios, true);
+    }
+
+    public Entrenamiento(long id, String fecha, List<EjercicioDetalle> ejercicios, boolean esPublico) {
         this.id = id;
         this.fecha = fecha;
         this.ejercicios = ejercicios;
+        this.esPublico = esPublico;
     }
 
     public long getId() {
@@ -36,5 +42,13 @@ public class Entrenamiento implements Serializable {
 
     public List<EjercicioDetalle> getEjerciciosDetalle() {
         return ejercicios;
+    }
+
+    public boolean isPublico() {
+        return esPublico;
+    }
+
+    public void setPublico(boolean esPublico) {
+        this.esPublico = esPublico;
     }
 }

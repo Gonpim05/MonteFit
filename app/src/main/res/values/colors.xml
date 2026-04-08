@@ -2,10 +2,28 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    
 
-    <color name="primary_fitness">#1E88E5</color>
-    <color name="primary_dark">#1565C0</color>
-    <color name="background_light">#F5F5F5</color>
-    <color name="text_secondary">#757575</color>
+    <!-- Paleta MonteFit - Fuerza / Gym -->
+    <color name="primary_fitness">#1A1A2E</color>
+    <color name="primary_dark">#16213E</color>
+    <color name="accent_power">#E94560</color>
+    <color name="accent_gold">#F5A623</color>
+    <color name="surface_dark">#0F3460</color>
+    <color name="card_background">#1F2937</color>
+    <color name="background_dark">#121212</color>
+    <color name="background_light">#1A1A2E</color>
+    <!-- Colores Modo Claro (Suave) -->
+    <color name="bg_light_main">#FAFAFA</color>
+    <color name="bg_light_card">#FFFFFF</color>
+    <color name="text_light_primary">#212121</color>
+    <color name="text_light_secondary">#757575</color>
+    <color name="accent_power_light">#FF5252</color>
+    <color name="surface_light">#EEEEEE</color>
+
+    <color name="text_secondary">#B0BEC5</color>
+    <color name="success_green">#4CAF50</color>
+    <color name="divider">#2D3748</color>
+    <color name="medal_gold">#FFD700</color>
+    <color name="medal_silver">#C0C0C0</color>
+    <color name="medal_bronze">#CD7F32</color>
 </resources>

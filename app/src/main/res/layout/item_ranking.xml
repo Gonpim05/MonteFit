@@ -3,18 +3,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp"
-    android:background="@android:drawable/dialog_holo_light_frame"
-    android:layout_marginBottom="4dp">
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="?attr/colorSurface"
+    android:layout_marginBottom="2dp">
 
     <TextView
         android:id="@+id/txtPosicion"
-        android:layout_width="30dp"
-        android:layout_height="wrap_content"
-        android:text="#1"
-        android:textSize="18sp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/boton_circular"
+        android:text="1"
+        android:textColor="@color/white"
         android:textStyle="bold"
-        android:textColor="@android:color/holo_blue_dark"/>
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/txtNombreUsuario"
@@ -23,7 +25,8 @@
         android:layout_weight="1"
         android:text="Usuario"
         android:textSize="16sp"
-        android:textColor="@android:color/black"/>
+        android:textColor="?android:attr/textColorPrimary"
+        android:layout_marginStart="12dp" />
 
     <TextView
         android:id="@+id/txtPesoMax"
@@ -32,18 +35,6 @@
         android:text="100 kg"
         android:textStyle="bold"
         android:textSize="16sp"
-        android:textColor="#D81B60"/>
+        android:textColor="?attr/colorPrimary"/>
 
 </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
-

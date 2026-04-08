@@ -2,7 +2,6 @@ package com.example.montefit;
 
 import android.annotation.SuppressLint;
 import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -87,9 +86,9 @@ public class PantallaSocial extends AppCompatActivity {
         }
         ArrayAdapter<String> miAdaptador = new ArrayAdapter<>(
                 this,
-                android.R.layout.simple_spinner_item,
+                R.layout.item_spinner,
                 ejerciciosPrincipales);
-        miAdaptador.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        miAdaptador.setDropDownViewResource(R.layout.item_spinner);
         spinnerEjercicios.setAdapter(miAdaptador);
 
         spinnerEjercicios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -117,7 +116,6 @@ public class PantallaSocial extends AppCompatActivity {
             InterfazListaSocial miAdaptador = new InterfazListaSocial(this, rankingsCursor);
             recyclerView.setAdapter(miAdaptador);
         } else {
-            // Empty miAdaptador or clear list
             recyclerView.setAdapter(null);
             Toast.makeText(this, "Aún no hay rankings para este ejercicio esta semana", Toast.LENGTH_SHORT).show();
         }
@@ -130,6 +128,8 @@ public class PantallaSocial extends AppCompatActivity {
         final android.widget.EditText inputNombre = new android.widget.EditText(this);
         inputNombre.setHint("Nombre del usuario");
         inputNombre.setPadding(50, 40, 50, 40);
+        inputNombre.setTextColor(android.graphics.Color.WHITE);
+        inputNombre.setHintTextColor(android.graphics.Color.LTGRAY);
         constructorDialogo.setView(inputNombre);
 
         constructorDialogo.setPositiveButton("Buscar", (miDialogo, which) -> {
@@ -162,17 +162,18 @@ public class PantallaSocial extends AppCompatActivity {
     }
 
     private void mostrarEntrenamientosUsuario(int userId, String nombreUsuario) {
-        Cursor entrenamientos = gestorBD.getUserTrainingsByUserId(userId);
+        // Solo mostramos entrenamientos PUBLICOS de otros usuarios
+        Cursor entrenamientos = gestorBD.getUserPublicTrainingsByUserId(userId);
 
         if (entrenamientos == null || entrenamientos.getCount() == 0) {
-            Toast.makeText(this, nombreUsuario + " no tiene entrenamientos registrados", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, nombreUsuario + " no tiene entrenamientos públicos", Toast.LENGTH_SHORT).show();
             if (entrenamientos != null)
                 entrenamientos.close();
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Entrenamientos de ").append(nombreUsuario).append(":\n\n");
+        sb.append("Entrenamientos públicos de ").append(nombreUsuario).append(":\n\n");
 
         int count = 0;
         while (entrenamientos.moveToNext() && count < 10) {
@@ -182,7 +183,6 @@ public class PantallaSocial extends AppCompatActivity {
             long rutinaId = entrenamientos.getLong(entrenamientos.getColumnIndex("id"));
 
             sb.append("📅 ").append(fecha).append("\n");
-
 
             Cursor detalles = gestorBD.getTrainingDetails(rutinaId);
             if (detalles != null && detalles.moveToFirst()) {
@@ -219,35 +219,3 @@ public class PantallaSocial extends AppCompatActivity {
                 .show();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

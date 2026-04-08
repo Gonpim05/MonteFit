@@ -3,45 +3,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:fitsSystemWindows="true"
+    android:background="?android:attr/colorBackground">
 
     <TextView
         android:id="@+id/tvTituloDetalle"
-        android:layout_width="wrap_content"
-        android:layout_height="85dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center"
-        android:text="Detalle del Entrenamiento"
-        android:textAlignment="center"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tvTotalKilos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Total Kilos Levantados: 0 kg"
-        android:textColor="@color/primary_fitness"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:text="📋 Detalle del Entrenamiento"
+        android:textAlignment="center"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/fondo_card"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvTotalKilos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Total Kilos Levantados: 0 kg"
+            android:textColor="?attr/colorPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:gravity="center" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/lvEjerciciosDetalle"
-        android:layout_width="360dp"
-        android:layout_height="450dp"
-        android:layout_weight="1" />
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="?android:attr/dividerHorizontal"
+        android:dividerHeight="1dp" />
 
 </LinearLayout>
-
-
-
-
-
-
-
-
-
-
-
-

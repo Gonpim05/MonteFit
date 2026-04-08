@@ -1,21 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground"
+    android:fitsSystemWindows="true"
+    android:fillViewport="true">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:padding="24dp"
-    android:background="#FFFFFF"
     tools:context=".PantallaPrincipal">
 
     <!-- LOGO -->
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="16dp"
         android:src="@drawable/montefit"
         android:contentDescription="Logo MonteFit"
         app:layout_constraintEnd_toEndOf="parent"
@@ -27,34 +33,14 @@
         android:id="@+id/RegistroTxt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Crear Cuenta"
-        android:textColor="#212121"
+        android:layout_marginTop="12dp"
+        android:text="Crear cuenta"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="26sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView" />
-
-    <!-- CAMPO CORREO -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/layoutCorreo"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:hint="Correo electrónico"
-        app:startIconDrawable="@android:drawable/ic_dialog_email"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutNombre">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/correo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textEmailAddress" />
-    </com.google.android.material.textfield.TextInputLayout>
 
     <!-- CAMPO NOMBRE -->
     <com.google.android.material.textfield.TextInputLayout
@@ -62,9 +48,12 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:hint="Nombre"
+        app:hintTextColor="?android:attr/textColorSecondary"
+        app:boxStrokeColor="?attr/colorPrimary"
         app:startIconDrawable="@android:drawable/ic_menu_myplaces"
+        app:startIconTint="@color/accent_power"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/RegistroTxt">
@@ -73,7 +62,34 @@
             android:id="@+id/etNombre"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textColorHint="?android:attr/textColorSecondary"
             android:inputType="textPersonName" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- CAMPO CORREO -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutCorreo"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Correo electrónico"
+        app:hintTextColor="?android:attr/textColorSecondary"
+        app:boxStrokeColor="?attr/colorPrimary"
+        app:startIconDrawable="@android:drawable/ic_dialog_email"
+        app:startIconTint="@color/accent_power"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/layoutNombre">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/correo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textColorHint="?android:attr/textColorSecondary"
+            android:inputType="textEmailAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <!-- CAMPO CONTRASEÑA -->
@@ -82,10 +98,13 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="12dp"
         android:hint="Contraseña"
+        app:hintTextColor="?android:attr/textColorSecondary"
+        app:boxStrokeColor="?attr/colorPrimary"
         app:passwordToggleEnabled="true"
         app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+        app:startIconTint="@color/accent_power"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutCorreo">
@@ -94,6 +113,8 @@
             android:id="@+id/contrasena"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textColorHint="?android:attr/textColorSecondary"
             android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -101,12 +122,13 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/botonRegistrate"
         android:layout_width="0dp"
-        android:layout_height="60dp"
-        android:layout_marginTop="32dp"
-        android:backgroundTint="#6200EE"
+        android:layout_height="56dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="@color/accent_power"
         android:text="Registrarse"
         android:textSize="16sp"
-        app:cornerRadius="8dp"
+        android:textStyle="bold"
+        app:cornerRadius="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/layoutContrasena" />
@@ -119,20 +141,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="¿Ya tienes cuenta? Inicia sesión"
-        android:textColor="#6200EE"
+        android:textColor="@color/accent_power"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/botonRegistrate" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
-
-
-
-
-
+</ScrollView>

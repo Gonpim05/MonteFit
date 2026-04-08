@@ -42,6 +42,11 @@ public class InterfazListaEntrenamientos extends RecyclerView.Adapter<InterfazLi
         Entrenamiento entrenamiento = entrenamientos.get(posicion);
         filaVisor.tvNombre.setText("Entrenamiento del " + entrenamiento.getFecha());
 
+        // Mostrar icono de visibilidad
+        if (filaVisor.tvIconoVisibilidad != null) {
+            filaVisor.tvIconoVisibilidad.setText(entrenamiento.isPublico() ? "🌐" : "🔒");
+        }
+
         filaVisor.itemView.setOnClickListener(v -> {
             Intent cambioPantalla = new Intent(contexto, PantallaDetalleEntrenamiento.class);
             cambioPantalla.putExtra("entrenamiento", entrenamiento);
@@ -68,34 +73,12 @@ public class InterfazListaEntrenamientos extends RecyclerView.Adapter<InterfazLi
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvNombre;
+        TextView tvIconoVisibilidad;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             tvNombre = itemView.findViewById(R.id.tvNombreEntrenamiento);
+            tvIconoVisibilidad = itemView.findViewById(R.id.tvIconoVisibilidad);
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

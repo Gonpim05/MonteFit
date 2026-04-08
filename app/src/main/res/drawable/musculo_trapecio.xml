@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="300dp"
+    android:viewportWidth="200"
+    android:viewportHeight="300">
+    <!-- Body silhouette -->
+    <path
+        android:fillColor="#555555"
+        android:pathData="M100,20 C108,20 115,28 115,38 C115,48 108,55 100,55 C92,55 85,48 85,38 C85,28 92,20 100,20 Z M80,60 L70,62 L55,90 L60,92 L72,70 L75,130 L65,200 L60,280 L75,282 L90,210 L100,180 L110,210 L125,282 L140,280 L135,200 L125,130 L128,70 L140,92 L145,90 L130,62 L120,60 Z" />
+    <!-- Trapezius highlighted in red -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M85,50 L75,58 L70,62 L80,60 L92,58 L100,56 L108,58 L120,60 L130,62 L125,58 L115,50 C110,52 105,54 100,54 C95,54 90,52 85,50 Z" />
+</vector>

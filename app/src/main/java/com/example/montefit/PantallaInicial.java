@@ -43,7 +43,7 @@ public class PantallaInicial extends AppCompatActivity {
                 rvEntrenamientos.setLayoutManager(new LinearLayoutManager(this));
                 listaEntrenamientos = new ArrayList<>();
                 miAdaptador = new InterfazListaEntrenamientos(this, listaEntrenamientos, posicion -> {
-                        showDeleteWorkoutDialog(posicion);
+                        showWorkoutOptionsDialog(posicion);
                 });
                 rvEntrenamientos.setAdapter(miAdaptador);
 
@@ -85,6 +85,7 @@ public class PantallaInicial extends AppCompatActivity {
                         do {
                                 long id = datosBD.getLong(datosBD.getColumnIndexOrThrow("id"));
                                 String date = datosBD.getString(datosBD.getColumnIndexOrThrow("date"));
+                                boolean esPublico = datosBD.getInt(datosBD.getColumnIndexOrThrow("es_publico")) == 1;
                                 List<Entrenamiento.EjercicioDetalle> ejerciciosDetalle = new ArrayList<>();
                                 Cursor detailCursor = gestorBD.getTrainingDetails(id);
                                 if (detailCursor != null && detailCursor.moveToFirst()) {
@@ -111,11 +112,35 @@ public class PantallaInicial extends AppCompatActivity {
                                         detailCursor.close();
                                 }
 
-                                listaEntrenamientos.add(new Entrenamiento(id, date, ejerciciosDetalle));
+                                listaEntrenamientos.add(new Entrenamiento(id, date, ejerciciosDetalle, esPublico));
                         } while (datosBD.moveToNext());
                         datosBD.close();
                 }
                 miAdaptador.notifyDataSetChanged();
+        }
+
+        private void showWorkoutOptionsDialog(int posicion) {
+                Entrenamiento e = listaEntrenamientos.get(posicion);
+                String visibilidadTexto = e.isPublico() ? "Hacer Privado 🔒" : "Hacer Público 🌐";
+                String[] options = { visibilidadTexto, "Eliminar" };
+
+                new AlertDialog.Builder(this)
+                                .setTitle("Opciones del Entrenamiento")
+                                .setItems(options, (miDialogo, which) -> {
+                                        if (which == 0) {
+                                                // Toggle visibilidad
+                                                if (gestorBD.toggleEntrenamientoPublico(e.getId())) {
+                                                        e.setPublico(!e.isPublico());
+                                                        miAdaptador.notifyItemChanged(posicion);
+                                                        Toast.makeText(this,
+                                                                        e.isPublico() ? "Entrenamiento público" : "Entrenamiento privado",
+                                                                        Toast.LENGTH_SHORT).show();
+                                                }
+                                        } else if (which == 1) {
+                                                showDeleteWorkoutDialog(posicion);
+                                        }
+                                })
+                                .show();
         }
 
         private void showDeleteWorkoutDialog(int posicion) {
@@ -136,34 +161,3 @@ public class PantallaInicial extends AppCompatActivity {
                                 .show();
         }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

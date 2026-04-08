@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="300dp"
+    android:viewportWidth="200"
+    android:viewportHeight="300">
+    <!-- Body silhouette -->
+    <path
+        android:fillColor="#555555"
+        android:pathData="M100,20 C108,20 115,28 115,38 C115,48 108,55 100,55 C92,55 85,48 85,38 C85,28 92,20 100,20 Z M80,60 L70,62 L55,90 L60,92 L72,70 L75,130 L65,200 L60,280 L75,282 L90,210 L100,180 L110,210 L125,282 L140,280 L135,200 L125,130 L128,70 L140,92 L145,90 L130,62 L120,60 Z" />
+    <!-- Left forearm -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M56,92 L54,100 L52,110 L52,120 L54,125 L60,125 L62,120 L62,110 L60,100 L58,92 Z" />
+    <!-- Right forearm -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M142,92 L140,100 L138,110 L138,120 L140,125 L146,125 L148,120 L148,110 L146,100 L144,92 Z" />
+</vector>

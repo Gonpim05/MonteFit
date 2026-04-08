@@ -5,18 +5,47 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
+    android:fitsSystemWindows="true"
+    android:background="?android:attr/colorBackground"
     tools:context=".PantallaEntrenar">
 
     <TextView
         android:id="@+id/tvTituloEntrenar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="16dp"
         android:text="Nuevo Entrenamiento"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="?android:attr/textColorPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Switch público/privado -->
+    <LinearLayout
+        android:id="@+id/layoutVisibilidad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvTituloEntrenar"
+        app:layout_constraintBottom_toBottomOf="@id/tvTituloEntrenar">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Público"
+            android:textSize="13sp"
+            android:textColor="?android:attr/textColorSecondary"
+            android:layout_marginEnd="6dp" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/switchPublico"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true" />
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvTrainingSession"
@@ -36,34 +65,25 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:text="Añadir Ejercicio"
-        android:backgroundTint="#00E5FF"
+        android:textColor="?attr/colorOnPrimary"
+        android:backgroundTint="?attr/colorPrimary"
         app:icon="@android:drawable/ic_input_add"
+        app:iconTint="?attr/colorOnPrimary"
         app:layout_constraintBottom_toTopOf="@id/btnFinalizarEntreno"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnFinalizarEntreno"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginBottom="48dp"
+        android:layout_height="56dp"
+        android:layout_marginBottom="24dp"
         android:text="Finalizar Entrenamiento"
-        android:textSize="18sp"
-        app:cornerRadius="8dp"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:backgroundTint="@color/success_green"
+        app:cornerRadius="12dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
-
-
-
-
-
-
-
-
-

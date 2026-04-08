@@ -3,6 +3,7 @@ package com.example.montefit;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Toast;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ public class PantallaLogros extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.pantalla_logros);
 
         gestorBD = GestorUsuarios.getInstance().getDbHelper();
@@ -53,18 +55,3 @@ public class PantallaLogros extends AppCompatActivity {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

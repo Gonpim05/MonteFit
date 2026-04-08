@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="300dp"
+    android:viewportWidth="200"
+    android:viewportHeight="300">
+    <!-- Body silhouette -->
+    <path
+        android:fillColor="#555555"
+        android:pathData="M100,20 C108,20 115,28 115,38 C115,48 108,55 100,55 C92,55 85,48 85,38 C85,28 92,20 100,20 Z M80,60 L70,62 L55,90 L60,92 L72,70 L75,130 L65,200 L60,280 L75,282 L90,210 L100,180 L110,210 L125,282 L140,280 L135,200 L125,130 L128,70 L140,92 L145,90 L130,62 L120,60 Z" />
+    <!-- Abs highlighted in red -->
+    <path
+        android:fillColor="#E53935"
+        android:pathData="M88,75 L112,75 L114,80 L114,90 L113,100 L112,110 L112,125 L88,125 L88,110 L87,100 L86,90 L86,80 Z" />
+    <!-- Ab lines -->
+    <path
+        android:strokeColor="#C62828"
+        android:strokeWidth="1"
+        android:pathData="M100,78 L100,122 M88,88 L112,88 M88,100 L112,100 M88,112 L112,112" />
+</vector>

@@ -6,6 +6,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public class PantallaDetalleEntrenamiento extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.pantalla_detalle_entrenamiento);
 
         TextView tvTitulo = findViewById(R.id.tvTituloDetalle);
@@ -24,30 +26,25 @@ public class PantallaDetalleEntrenamiento extends AppCompatActivity {
         Entrenamiento entrenamiento = (Entrenamiento) getIntent().getSerializableExtra("entrenamiento");
 
         if (entrenamiento != null) {
-            tvTitulo.setText("Detalle del " + entrenamiento.getFecha());
+            tvTitulo.setText("📋 Detalle del " + entrenamiento.getFecha());
 
             double totalPeso = 0;
             java.util.List<String> displayList = new java.util.ArrayList<>();
 
             for (Entrenamiento.EjercicioDetalle ed : entrenamiento.getEjerciciosDetalle()) {
-                String elemento = ed.nombre + ": " + ed.series + " series x " + ed.peso + " kg";
+                String elemento = "💪 " + ed.nombre + ": " + ed.series + " series x " + ed.peso + " kg";
                 displayList.add(elemento);
                 totalPeso += (ed.series * ed.peso);
             }
 
-            ArrayAdapter<String> miAdaptador = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, displayList);
+            ArrayAdapter<String> miAdaptador = new ArrayAdapter<>(this,
+                    android.R.layout.simple_list_item_1, displayList);
             lvEjercicios.setAdapter(miAdaptador);
 
-            tvTotalKilos.setText("Total Kilos Levantados: " + String.format("%.1f", totalPeso) + " kg");
+            tvTotalKilos.setText("🏋️ Total Kilos: " + String.format("%.1f", totalPeso) + " kg");
         } else {
             Toast.makeText(this, "Error al cargar entrenamiento", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 }
-
-
-
-
-
-

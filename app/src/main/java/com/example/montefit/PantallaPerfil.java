@@ -1,15 +1,18 @@
 package com.example.montefit;
 
 import android.os.Bundle;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class PantallaPerfil extends AppCompatActivity {
     private android.widget.TextView tvNombre, tvEmail, tvDetails;
     private com.google.android.material.button.MaterialButton btnCambiarPass, btnEditarPerfil;
+    private android.widget.ImageButton btnThemeToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.pantalla_perfil);
 
         tvNombre = findViewById(R.id.tvNombrePerfil);
@@ -17,8 +20,17 @@ public class PantallaPerfil extends AppCompatActivity {
         tvDetails = findViewById(R.id.tvDetails);
         btnCambiarPass = findViewById(R.id.btnCambiarContrasena);
         btnEditarPerfil = findViewById(R.id.btnEditarPerfil);
+        btnThemeToggle = findViewById(R.id.btnThemeToggle);
 
+        updateThemeIcon();
         loadUserData();
+
+        btnThemeToggle.setOnClickListener(v -> {
+            int currentMode = PreferenciasApp.getThemeMode(this);
+            int newMode = (currentMode == 0) ? 1 : 0; // Toggle 0 (Dark) <-> 1 (Light)
+            PreferenciasApp.saveThemeMode(this, newMode);
+            recreate(); // Recargar actividad para aplicar tema
+        });
 
         btnCambiarPass.setOnClickListener(v -> mostrarDialogoCambioPass());
         btnEditarPerfil.setOnClickListener(v -> mostrarDialogoEditarPerfil());
@@ -40,8 +52,10 @@ public class PantallaPerfil extends AppCompatActivity {
                     String sex = datosBD.getString(datosBD.getColumnIndexOrThrow("sex"));
 
                     tvNombre.setText(nombre != null ? nombre : "Sin Nombre");
-                    tvDetails.setText(
-                            String.format("Edad: %d | Peso: %.1fkg | Sexo: %s", age, peso, sex != null ? sex : "--"));
+                    String ageStr = age > 0 ? String.valueOf(age) : "--";
+                    String pesoStr = peso > 0 ? String.format("%.1fkg", peso) : "--";
+                    String sexStr = (sex != null && !sex.isEmpty()) ? sex : "--";
+                    tvDetails.setText(String.format("Edad: %s | Peso: %s | Sexo: %s", ageStr, pesoStr, sexStr));
                     datosBD.close();
                 }
             }
@@ -79,11 +93,15 @@ public class PantallaPerfil extends AppCompatActivity {
         final android.widget.EditText inputName = new android.widget.EditText(this);
         inputName.setHint("Nombre");
         inputName.setText(currentName);
+        inputName.setTextColor(android.graphics.Color.WHITE);
+        inputName.setHintTextColor(android.graphics.Color.LTGRAY);
         contenedor.addView(inputName);
 
         final android.widget.EditText inputAge = new android.widget.EditText(this);
         inputAge.setHint("Edad");
         inputAge.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        inputAge.setTextColor(android.graphics.Color.WHITE);
+        inputAge.setHintTextColor(android.graphics.Color.LTGRAY);
         if (currentAge > 0)
             inputAge.setText(String.valueOf(currentAge));
         contenedor.addView(inputAge);
@@ -92,15 +110,26 @@ public class PantallaPerfil extends AppCompatActivity {
         inputWeight.setHint("Peso (kg)");
         inputWeight.setInputType(
                 android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        inputWeight.setTextColor(android.graphics.Color.WHITE);
+        inputWeight.setHintTextColor(android.graphics.Color.LTGRAY);
         if (currentWeight > 0)
             inputWeight.setText(String.valueOf(currentWeight));
         contenedor.addView(inputWeight);
 
-        final android.widget.EditText inputSex = new android.widget.EditText(this);
-        inputSex.setHint("Sexo (Hombre/Mujer)");
-        if (currentSex != null)
-            inputSex.setText(currentSex);
-        contenedor.addView(inputSex);
+        final android.widget.Spinner spinnerSex = new android.widget.Spinner(this);
+        String[] sexOptions = { "Hombre", "Mujer", "Otro" };
+        android.widget.ArrayAdapter<String> adapterSex = new android.widget.ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item, sexOptions);
+        spinnerSex.setAdapter(adapterSex);
+        if (currentSex != null) {
+            for (int i = 0; i < sexOptions.length; i++) {
+                if (sexOptions[i].equals(currentSex)) {
+                    spinnerSex.setSelection(i);
+                    break;
+                }
+            }
+        }
+        contenedor.addView(spinnerSex);
 
         constructorDialogo.setView(contenedor);
 
@@ -108,7 +137,7 @@ public class PantallaPerfil extends AppCompatActivity {
             String newName = inputName.getText().toString();
             String ageStr = inputAge.getText().toString();
             String weightStr = inputWeight.getText().toString();
-            String newSex = inputSex.getText().toString();
+            String newSex = spinnerSex.getSelectedItem().toString();
 
             int newAge = ageStr.isEmpty() ? 0 : Integer.parseInt(ageStr);
             double newWeight = weightStr.isEmpty() ? 0 : Double.parseDouble(weightStr);
@@ -128,7 +157,6 @@ public class PantallaPerfil extends AppCompatActivity {
         android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
         constructorDialogo.setTitle("Cambiar Contraseña");
 
-        // contenedor del diálogo
         android.widget.LinearLayout contenedor = new android.widget.LinearLayout(this);
         contenedor.setOrientation(android.widget.LinearLayout.VERTICAL);
         contenedor.setPadding(50, 40, 50, 10);
@@ -179,20 +207,13 @@ public class PantallaPerfil extends AppCompatActivity {
                     .show();
         }
     }
+
+    private void updateThemeIcon() {
+        int mode = PreferenciasApp.getThemeMode(this);
+        if (mode == 1) {
+            btnThemeToggle.setImageResource(R.drawable.ic_moon); // Si está en luz, mostrar luna
+        } else {
+            btnThemeToggle.setImageResource(R.drawable.ic_sun); // Si está en oscuro, mostrar sol
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -37,7 +37,6 @@ public class InterfazListaLogros extends RecyclerView.Adapter<InterfazListaLogro
         int idxTitulo = datosBD.getColumnIndex(GestorBaseDatos.COLUMN_LOGRO_TITULO);
         @SuppressLint("Range")
         int idxDesc = datosBD.getColumnIndex(GestorBaseDatos.COLUMN_LOGRO_DESCRIPCION);
-        // The simple alias "obtenido" from the subquery
         @SuppressLint("Range")
         int idxObtenido = datosBD.getColumnIndex("obtenido");
 
@@ -49,6 +48,11 @@ public class InterfazListaLogros extends RecyclerView.Adapter<InterfazListaLogro
         filaVisor.txtDesc.setText(descripcion);
         filaVisor.checkBox.setChecked(obtenido);
         filaVisor.itemView.setAlpha(obtenido ? 1.0f : 0.5f);
+
+        // Emoji del logro según si está obtenido o no
+        if (filaVisor.txtEmoji != null) {
+            filaVisor.txtEmoji.setText(obtenido ? "🏆" : "🔒");
+        }
     }
 
     @Override
@@ -57,7 +61,7 @@ public class InterfazListaLogros extends RecyclerView.Adapter<InterfazListaLogro
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTitulo, txtDesc;
+        TextView txtTitulo, txtDesc, txtEmoji;
         CheckBox checkBox;
 
         public ViewHolder(@NonNull View itemView) {
@@ -65,29 +69,7 @@ public class InterfazListaLogros extends RecyclerView.Adapter<InterfazListaLogro
             txtTitulo = itemView.findViewById(R.id.txtTituloLogro);
             txtDesc = itemView.findViewById(R.id.txtDescLogro);
             checkBox = itemView.findViewById(R.id.checkLogro);
+            txtEmoji = itemView.findViewById(R.id.txtEmojiLogro);
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
