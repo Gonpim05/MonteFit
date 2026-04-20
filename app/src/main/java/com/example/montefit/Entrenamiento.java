@@ -13,11 +13,13 @@ public class Entrenamiento implements Serializable {
         public String nombre;
         public int series;
         public double peso;
+        public int repeticiones;
 
-        public EjercicioDetalle(String nombre, int series, double peso) {
+        public EjercicioDetalle(String nombre, int series, double peso, int repeticiones) {
             this.nombre = nombre;
             this.series = series;
             this.peso = peso;
+            this.repeticiones = repeticiones;
         }
     }
 

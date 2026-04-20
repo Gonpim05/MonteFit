@@ -2,86 +2,74 @@ package com.example.montefit;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import org.json.JSONObject;
 
 public class PantallaPrincipal extends AppCompatActivity {
-    private EditText etCorreo, etContrasena;
-    private Button btnLoguear, btnIrARegistro;
+
+    private EditText campoCorreo, campoContrasena;
+    private Button botonLogin, botonRegistro;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Aplicar tema antes de onCreate
         PreferenciasApp.applyTheme(PreferenciasApp.getThemeMode(this));
         super.onCreate(savedInstanceState);
-        GestorUsuarios.getInstance().init(this);
         EdgeToEdge.enable(this);
         setContentView(R.layout.layout_login);
-        View mainView = findViewById(R.id.main);
-        if (mainView != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(mainView, (v, insets) -> {
-                Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-                return insets;
-            });
-        }
-        etCorreo = findViewById(R.id.correo);
-        etContrasena = findViewById(R.id.contrasena);
-        btnLoguear = findViewById(R.id.botonLoguear);
-        btnIrARegistro = findViewById(R.id.botonRegistro);
-        btnLoguear.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String correo = etCorreo.getText().toString().trim();
-                String contrasena = etContrasena.getText().toString().trim();
 
-                if (correo.isEmpty() || contrasena.isEmpty()) {
-                    Toast.makeText(PantallaPrincipal.this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT)
-                            .show();
-                } else {
-                    if (GestorUsuarios.getInstance().login(correo, contrasena)) {
-                        Toast.makeText(PantallaPrincipal.this, "Bienvenido " + correo, Toast.LENGTH_SHORT).show();
-                        Intent cambioPantalla = new Intent(PantallaPrincipal.this, PantallaInicial.class);
-                        startActivity(cambioPantalla);
-                        finish();
-                    } else {
-                        Toast.makeText(PantallaPrincipal.this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-        btnIrARegistro.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent cambioPantalla = new Intent(PantallaPrincipal.this, PantallaRegistro.class);
-                startActivity(cambioPantalla);
-            }
+        campoCorreo = findViewById(R.id.correo);
+        campoContrasena = findViewById(R.id.contrasena);
+        botonLogin = findViewById(R.id.botonLoguear);
+        botonRegistro = findViewById(R.id.botonRegistro);
+
+        botonLogin.setOnClickListener(v -> intentarLogin());
+
+        botonRegistro.setOnClickListener(v -> {
+            startActivity(new Intent(this, PantallaRegistro.class));
         });
     }
+
+    private void intentarLogin() {
+        String correo = campoCorreo.getText().toString().trim();
+        String contrasena = campoContrasena.getText().toString().trim();
+
+        if (correo.isEmpty() || contrasena.isEmpty()) {
+            Toast.makeText(this, "Rellena todos los campos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        botonLogin.setEnabled(false);
+        botonLogin.setText("Conectando...");
+
+        new Thread(() -> {
+            JSONObject resp = ClienteApi.obtenerInstancia().iniciarSesion(correo, contrasena);
+            boolean loginOk = resp.optBoolean("ok", false);
+            String error = resp.optString("error", "Correo o contraseña incorrectos");
+
+            runOnUiThread(() -> {
+                botonLogin.setEnabled(true);
+                botonLogin.setText("Iniciar sesión");
+
+                if (loginOk) {
+                    GestorUsuarios.getInstance().setCorreoActual(correo);
+                    // Obtener el usuario_id en segundo plano
+                    new Thread(() -> {
+                        int userId = ClienteApi.obtenerInstancia().obtenerUsuarioId(correo);
+                        GestorUsuarios.getInstance().setUsuarioId(userId);
+                    }).start();
+
+                    startActivity(new Intent(PantallaPrincipal.this, PantallaInicial.class));
+                    finish();
+                } else {
+                    Toast.makeText(this, error, Toast.LENGTH_LONG).show();
+                }
+            });
+        }).start();
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

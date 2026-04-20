@@ -1,23 +1,36 @@
 package com.example.montefit;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
 
+/**
+ * Adaptador de ranking social - usa List en vez de Cursor (ya no depende de SQLite).
+ */
 public class InterfazListaSocial extends RecyclerView.Adapter<InterfazListaSocial.ViewHolder> {
 
     private Context contexto;
-    private Cursor datosBD;
+    private List<ItemRanking> listaRanking;
 
-    public InterfazListaSocial(Context contexto, Cursor datosBD) {
+    /** Modelo simple para un item del ranking */
+    public static class ItemRanking {
+        public String nombre;
+        public float pesoMaximo;
+
+        public ItemRanking(String nombre, float pesoMaximo) {
+            this.nombre = nombre;
+            this.pesoMaximo = pesoMaximo;
+        }
+    }
+
+    public InterfazListaSocial(Context contexto, List<ItemRanking> listaRanking) {
         this.contexto = contexto;
-        this.datosBD = datosBD;
+        this.listaRanking = listaRanking;
     }
 
     @NonNull
@@ -29,24 +42,16 @@ public class InterfazListaSocial extends RecyclerView.Adapter<InterfazListaSocia
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder filaVisor, int posicion) {
-        if (!datosBD.moveToPosition(posicion))
-            return;
-        @SuppressLint("Range")
-        int idxNombre = datosBD.getColumnIndex(GestorBaseDatos.COLUMN_NOMBRE);
-        @SuppressLint("Range")
-        int idxPeso = datosBD.getColumnIndex(GestorBaseDatos.COLUMN_PESO_MAXIMO);
-
-        String nombre = datosBD.getString(idxNombre);
-        float peso = datosBD.getFloat(idxPeso);
+        ItemRanking item = listaRanking.get(posicion);
 
         filaVisor.txtPosicion.setText("#" + (posicion + 1));
-        filaVisor.txtNombre.setText(nombre);
-        filaVisor.txtPeso.setText(String.format("%.1f kg", peso));
+        filaVisor.txtNombre.setText(item.nombre);
+        filaVisor.txtPeso.setText(String.format("%.1f kg", item.pesoMaximo));
     }
 
     @Override
     public int getItemCount() {
-        return datosBD == null ? 0 : datosBD.getCount();
+        return listaRanking == null ? 0 : listaRanking.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -60,26 +65,3 @@ public class InterfazListaSocial extends RecyclerView.Adapter<InterfazListaSocia
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

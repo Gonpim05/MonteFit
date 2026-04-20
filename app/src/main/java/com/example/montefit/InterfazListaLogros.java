@@ -1,8 +1,6 @@
 package com.example.montefit;
 
 import android.content.Context;
-import android.annotation.SuppressLint;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +8,32 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.List;
 
+/**
+ * Adaptador de logros - usa List en vez de Cursor (ya no depende de SQLite).
+ */
 public class InterfazListaLogros extends RecyclerView.Adapter<InterfazListaLogros.ViewHolder> {
 
     private Context contexto;
-    private Cursor datosBD;
+    private List<Logro> listaLogros;
 
-    public InterfazListaLogros(Context contexto, Cursor datosBD) {
+    /** Modelo simple para un logro */
+    public static class Logro {
+        public String titulo;
+        public String descripcion;
+        public boolean obtenido;
+
+        public Logro(String titulo, String descripcion, boolean obtenido) {
+            this.titulo = titulo;
+            this.descripcion = descripcion;
+            this.obtenido = obtenido;
+        }
+    }
+
+    public InterfazListaLogros(Context contexto, List<Logro> listaLogros) {
         this.contexto = contexto;
-        this.datosBD = datosBD;
+        this.listaLogros = listaLogros;
     }
 
     @NonNull
@@ -30,34 +45,21 @@ public class InterfazListaLogros extends RecyclerView.Adapter<InterfazListaLogro
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder filaVisor, int posicion) {
-        if (!datosBD.moveToPosition(posicion))
-            return;
+        Logro logro = listaLogros.get(posicion);
 
-        @SuppressLint("Range")
-        int idxTitulo = datosBD.getColumnIndex(GestorBaseDatos.COLUMN_LOGRO_TITULO);
-        @SuppressLint("Range")
-        int idxDesc = datosBD.getColumnIndex(GestorBaseDatos.COLUMN_LOGRO_DESCRIPCION);
-        @SuppressLint("Range")
-        int idxObtenido = datosBD.getColumnIndex("obtenido");
+        filaVisor.txtTitulo.setText(logro.titulo);
+        filaVisor.txtDesc.setText(logro.descripcion);
+        filaVisor.checkBox.setChecked(logro.obtenido);
+        filaVisor.itemView.setAlpha(logro.obtenido ? 1.0f : 0.5f);
 
-        String titulo = datosBD.getString(idxTitulo);
-        String descripcion = datosBD.getString(idxDesc);
-        boolean obtenido = datosBD.getInt(idxObtenido) > 0;
-
-        filaVisor.txtTitulo.setText(titulo);
-        filaVisor.txtDesc.setText(descripcion);
-        filaVisor.checkBox.setChecked(obtenido);
-        filaVisor.itemView.setAlpha(obtenido ? 1.0f : 0.5f);
-
-        // Emoji del logro según si está obtenido o no
         if (filaVisor.txtEmoji != null) {
-            filaVisor.txtEmoji.setText(obtenido ? "🏆" : "🔒");
+            filaVisor.txtEmoji.setText(logro.obtenido ? "🏆" : "🔒");
         }
     }
 
     @Override
     public int getItemCount() {
-        return datosBD == null ? 0 : datosBD.getCount();
+        return listaLogros == null ? 0 : listaLogros.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

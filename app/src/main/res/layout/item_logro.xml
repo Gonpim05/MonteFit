@@ -4,15 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="3dp"
     app:cardBackgroundColor="?attr/colorSurface">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="18dp"
         android:gravity="center_vertical">
 
         <TextView
@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🏆"
-            android:textSize="24sp"
+            android:textSize="28sp"
             android:layout_marginEnd="16dp" />
 
         <LinearLayout
@@ -45,7 +45,7 @@
                 android:text="Descripción del logro..."
                 android:textSize="13sp"
                 android:textColor="?android:attr/textColorSecondary"
-                android:layout_marginTop="2dp" />
+                android:layout_marginTop="4dp" />
         </LinearLayout>
 
         <CheckBox
@@ -54,6 +54,6 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            app:buttonTint="?attr/colorPrimary" />
+            app:buttonTint="@color/accent_gold" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -1,94 +1,43 @@
 package com.example.montefit;
 
-import android.content.Context;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
+/**
+ * Singleton que guarda el estado del usuario actual.
+ * Ya NO usa GestorBaseDatos (SQLite). Ahora solo guarda el correo del usuario logueado.
+ * Las pantallas usan ClienteApi directamente para acceder a MySQL.
+ */
 public class GestorUsuarios {
-    private static GestorUsuarios instance;
-    private GestorBaseDatos gestorBD;
+
+    private static GestorUsuarios instancia;
     private String correoActual;
+    private int usuarioIdActual = -1;
 
-    private GestorUsuarios() {
-
-    }
+    private GestorUsuarios() {}
 
     public static synchronized GestorUsuarios getInstance() {
-        if (instance == null) {
-            instance = new GestorUsuarios();
+        if (instancia == null) {
+            instancia = new GestorUsuarios();
         }
-        return instance;
+        return instancia;
     }
 
-    public void init(Context contexto) {
-        if (gestorBD == null) {
-            gestorBD = new GestorBaseDatos(contexto);
-            // Ensure admin user exists for testing
-            if (!gestorBD.checkUser("admin@montefit.com")) {
-                register("admin@montefit.com", "1234", "Admin User");
-            }
-        }
+    public void setCorreoActual(String correo) {
+        this.correoActual = correo;
     }
 
-
-    public boolean register(String correo, String contrasena, String nombre) {
-        if (gestorBD == null)
-            return false;
-        if (gestorBD.checkUser(correo)) {
-            return false;
-        }
-        String hashedPassword = contrasena;
-
-
-        return gestorBD.addUser(correo, contrasena, nombre);
-    }
-    public boolean login(String correo, String contrasena) {
-        if (gestorBD == null)
-            return false;
-
-        if (gestorBD.checkUserPassword(correo, contrasena)) {
-            this.correoActual = correo;
-            return true;
-        }
-        return false;
-    }
-
-    public String getCurrentUserEmail() {
+    public String getCorreoActual() {
         return correoActual;
     }
 
-    public void logout() {
-        correoActual = null;
+    public void setUsuarioId(int id) {
+        this.usuarioIdActual = id;
     }
 
-    public GestorBaseDatos getDbHelper() {
-        return gestorBD;
+    public int getUsuarioId() {
+        return usuarioIdActual;
     }
-    private String hashPassword(String contrasena) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(contrasena.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : hash) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1)
-                    hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
+
+    public void cerrarSesion() {
+        correoActual = null;
+        usuarioIdActual = -1;
     }
 }
-
-
-
-
-
-
-
-
-
-

@@ -7,70 +7,87 @@
     android:fitsSystemWindows="true"
     android:background="?android:attr/colorBackground">
 
-    <!-- Header -->
-    <View
-        android:id="@+id/headerBackground"
+    <!-- TOP HEADER (Saludo y Perfil) -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="140dp"
-        android:background="@color/primary_fitness"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="wrap_content"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent">
 
+        <TextView
+            android:id="@+id/tvGreeting"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="¡Hola!"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:textColor="?android:attr/textColorPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnPerfil"
+            android:layout_marginEnd="16dp" />
+
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿Listo para darlo todo hoy?"
+            android:textSize="14sp"
+            android:textColor="?android:attr/textColorSecondary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvGreeting"
+            android:layout_marginTop="2dp" />
+
+        <TextView
+            android:id="@+id/btnPerfil"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/boton_circular"
+            android:gravity="center"
+            android:text="👤"
+            android:textSize="24sp"
+            android:textColor="@color/white"
+            android:elevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tvSubtitle" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- TÍTULO DE LISTA -->
     <TextView
-        android:id="@+id/tvTituloMfit"
+        android:id="@+id/tvRecent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:text="MONTE FIT"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="26sp"
+        android:text="Historial de Entrenamientos"
+        android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Tus últimos entrenamientos"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTituloMfit" />
-
-    <!-- Botón Perfil -->
-    <Button
-        android:id="@+id/btnPerfil"
-        android:layout_width="wrap_content"
-        android:layout_height="36dp"
-        android:layout_marginTop="36dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/boton_secundario"
-        android:text="Perfil"
         android:textColor="?android:attr/textColorPrimary"
-        android:textSize="12sp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/header" />
 
-    <!-- Lista de Entrenamientos -->
+
+    <!-- RECYCLER VIEW DE ENTRENAMIENTOS -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvEntrenamientos"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginTop="12dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="12dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toBottomOf="@+id/tvRecent"
         app:layout_constraintBottom_toTopOf="@+id/guidelineBottom"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerBackground"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:listitem="@layout/item_entrenamiento" />
 
     <androidx.constraintlayout.widget.Guideline
@@ -78,17 +95,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.72" />
+        app:layout_constraintGuide_percent="0.75" />
 
-    <!-- Fila Superior de Botones -->
+    <!-- ACCIONES RÁPIDAS (Botonera) -->
     <LinearLayout
         android:id="@+id/buttonRow1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:layout_marginTop="8dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:layout_marginTop="4dp"
         app:layout_constraintTop_toBottomOf="@+id/guidelineBottom">
 
         <Button
@@ -116,15 +133,14 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Fila Inferior de Botones -->
     <LinearLayout
         android:id="@+id/buttonRow2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:layout_marginTop="8dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@+id/buttonRow1">
 
         <Button

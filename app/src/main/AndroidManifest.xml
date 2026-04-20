@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Permiso para conectarse a internet (API PHP) -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -10,8 +13,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MonteFit">
-
+        android:theme="@style/Theme.MonteFit"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".PantallaPrincipal"
@@ -22,10 +25,7 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".PantallaRegistro"
-            android:exported="false" />
-
+        <activity android:name=".PantallaRegistro" android:exported="false" />
         <activity android:name=".PantallaInicial" android:exported="false"/>
         <activity android:name=".PantallaEntrenar" android:exported="false"/>
         <activity android:name=".PantallaComida" android:exported="false"/>
@@ -37,11 +37,3 @@
     </application>
 
 </manifest>
-
-
-
-
-
-
-
-

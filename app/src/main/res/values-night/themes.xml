@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Night theme -->
+    <!-- Tema Oscuro - Gym / Fuerza -->
     <style name="Base.Theme.MonteFit" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/accent_power</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -9,10 +9,10 @@
         <item name="colorOnSurface">@color/white</item>
         <item name="android:colorBackground">@color/background_dark</item>
         <item name="android:windowBackground">@color/background_dark</item>
-        <item name="android:statusBarColor">@color/primary_fitness</item>
+        <item name="android:statusBarColor">@color/background_dark</item>
         <item name="android:navigationBarColor">@color/background_dark</item>
         <item name="android:textColorPrimary">@color/white</item>
-        <item name="android:textColorSecondary">#B0BEC5</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
         <item name="android:editTextColor">@color/white</item>
         <item name="alertDialogTheme">@style/Theme.MonteFit.Dialog</item>
     </style>
@@ -20,7 +20,7 @@
     <style name="Theme.MonteFit.Dialog" parent="Theme.Material3.DayNight.Dialog">
         <item name="android:windowBackground">@color/card_background</item>
         <item name="android:textColorPrimary">@color/white</item>
-        <item name="colorSurface">@color/background_dark</item>
+        <item name="colorSurface">@color/card_background</item>
         <item name="colorOnSurface">@color/white</item>
     </style>
 

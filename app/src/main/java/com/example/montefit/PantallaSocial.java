@@ -1,221 +1,189 @@
 package com.example.montefit;
 
-import android.annotation.SuppressLint;
-import android.database.Cursor;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.Calendar;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class PantallaSocial extends AppCompatActivity {
 
+    private RecyclerView recyclerRanking;
     private Spinner spinnerEjercicios;
-    private RecyclerView recyclerView;
-    private TextView tvSemanaActual;
-    private Button btnBuscarUsuario;
-    private GestorBaseDatos gestorBD;
+    private List<JSONObject> listaEjerciciosTodos = new ArrayList<>();
+    private InterfazListaSocial adaptadorRanking;
+    private List<InterfazListaSocial.ItemRanking> listaRanking = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.pantalla_social);
 
-        gestorBD = GestorUsuarios.getInstance().getDbHelper();
-        if (gestorBD == null) {
-            GestorUsuarios.getInstance().init(this);
-            gestorBD = GestorUsuarios.getInstance().getDbHelper();
-        }
+        recyclerRanking = findViewById(R.id.recyclerRanking);
+        recyclerRanking.setLayoutManager(new LinearLayoutManager(this));
+        adaptadorRanking = new InterfazListaSocial(this, listaRanking);
+        recyclerRanking.setAdapter(adaptadorRanking);
 
         spinnerEjercicios = findViewById(R.id.spinnerEjerciciosRanking);
-        recyclerView = findViewById(R.id.recyclerRanking);
-        tvSemanaActual = findViewById(R.id.tvSemanaActual);
-        btnBuscarUsuario = findViewById(R.id.btnBuscarUsuario);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        TextView tvSemana = findViewById(R.id.tvSemanaActual);
 
-        // Mostrar semana actual
-        Calendar cal = Calendar.getInstance();
-        int semana = cal.get(Calendar.WEEK_OF_YEAR);
-        int anio = cal.get(Calendar.YEAR);
-        tvSemanaActual.setText("Ranking Semanal: Semana " + semana + " - " + anio);
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+        tvSemana.setText("Semana " + cal.get(java.util.Calendar.WEEK_OF_YEAR) + " - " + cal.get(java.util.Calendar.YEAR));
 
-        btnBuscarUsuario.setOnClickListener(v -> mostrarDialogoBusquedaUsuario());
+        // Cargar ejercicios en el spinner
+        new Thread(() -> {
+            JSONArray ejercicios = ClienteApi.obtenerInstancia().obtenerTodosEjercicios();
+            List<String> nombresEj = new ArrayList<>();
+            listaEjerciciosTodos.clear();
 
-        setupSpinner();
-    }
+            for (int i = 0; i < ejercicios.length(); i++) {
+                try {
+                    JSONObject obj = ejercicios.getJSONObject(i);
+                    listaEjerciciosTodos.add(obj);
+                    nombresEj.add(obj.optString("nombre", ""));
+                } catch (Exception e) { e.printStackTrace(); }
+            }
 
-    private void setupSpinner() {
-        String[] ejerciciosPrincipales = { "Press Banca", "Peso Muerto", "Sentadilla" };
-        final int[] ejercicioIds = new int[3];
-        Cursor allExercises = gestorBD.getAllEjercicios();
-        if (allExercises != null && allExercises.moveToFirst()) {
-            do {
-                @SuppressLint("Range")
-                String nombre = allExercises.getString(allExercises.getColumnIndex("nombre"));
-                @SuppressLint("Range")
-                int id = allExercises.getInt(allExercises.getColumnIndex("_id"));
+            runOnUiThread(() -> {
+                ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this,
+                        android.R.layout.simple_spinner_dropdown_item, nombresEj);
+                spinnerEjercicios.setAdapter(spinnerAdapter);
 
-                for (int i = 0; i < ejerciciosPrincipales.length; i++) {
-                    if (nombre.equalsIgnoreCase(ejerciciosPrincipales[i])) {
-                        ejercicioIds[i] = id;
-                        break;
+                spinnerEjercicios.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int pos, long id) {
+                        cargarRanking(pos);
                     }
-                }
-            } while (allExercises.moveToNext());
-            allExercises.close();
-        }
-        boolean todosEncontrados = true;
-        for (int i = 0; i < ejercicioIds.length; i++) {
-            if (ejercicioIds[i] == 0) {
-                Toast.makeText(this, "Ejercicio '" + ejerciciosPrincipales[i] + "' no encontrado. Reinstala la app.",
-                        Toast.LENGTH_LONG).show();
-                todosEncontrados = false;
-            }
-        }
+                    @Override
+                    public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+                });
+            });
+        }).start();
 
-        if (!todosEncontrados) {
-            finish();
-            return;
-        }
-        ArrayAdapter<String> miAdaptador = new ArrayAdapter<>(
-                this,
-                R.layout.item_spinner,
-                ejerciciosPrincipales);
-        miAdaptador.setDropDownViewResource(R.layout.item_spinner);
-        spinnerEjercicios.setAdapter(miAdaptador);
-
-        spinnerEjercicios.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> padre, View vista, int posicion, long id) {
-                if (posicion >= 0 && posicion < ejercicioIds.length) {
-                    loadRankingsForExercise(ejercicioIds[posicion]);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> padre) {
-            }
-        });
+        // Buscar usuario
+        findViewById(R.id.btnBuscarUsuario).setOnClickListener(v -> mostrarBuscarUsuario());
     }
 
-    private void loadRankingsForExercise(int ejercicioId) {
-        if (ejercicioId == 0) {
-            Toast.makeText(this, "Ejercicio no encontrado en la base de datos", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void cargarRanking(int posSpinner) {
+        if (posSpinner < 0 || posSpinner >= listaEjerciciosTodos.size()) return;
 
-        Cursor rankingsCursor = gestorBD.getEstadisticasRanking(ejercicioId);
-        if (rankingsCursor != null && rankingsCursor.getCount() > 0) {
-            InterfazListaSocial miAdaptador = new InterfazListaSocial(this, rankingsCursor);
-            recyclerView.setAdapter(miAdaptador);
-        } else {
-            recyclerView.setAdapter(null);
-            Toast.makeText(this, "Aún no hay rankings para este ejercicio esta semana", Toast.LENGTH_SHORT).show();
-        }
-    }
+        int ejercicioId = listaEjerciciosTodos.get(posSpinner).optInt("_id", 0);
 
-    private void mostrarDialogoBusquedaUsuario() {
-        android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
-        constructorDialogo.setTitle("Buscar Usuario");
+        new Thread(() -> {
+            JSONArray ranking = ClienteApi.obtenerInstancia().obtenerRankings(ejercicioId);
+            List<InterfazListaSocial.ItemRanking> lista = new ArrayList<>();
 
-        final android.widget.EditText inputNombre = new android.widget.EditText(this);
-        inputNombre.setHint("Nombre del usuario");
-        inputNombre.setPadding(50, 40, 50, 40);
-        inputNombre.setTextColor(android.graphics.Color.WHITE);
-        inputNombre.setHintTextColor(android.graphics.Color.LTGRAY);
-        constructorDialogo.setView(inputNombre);
-
-        constructorDialogo.setPositiveButton("Buscar", (miDialogo, which) -> {
-            String nombre = inputNombre.getText().toString().trim();
-            if (!nombre.isEmpty()) {
-                buscarYMostrarUsuario(nombre);
-            } else {
-                Toast.makeText(this, "Ingresa un nombre", Toast.LENGTH_SHORT).show();
+            for (int i = 0; i < ranking.length(); i++) {
+                try {
+                    JSONObject obj = ranking.getJSONObject(i);
+                    lista.add(new InterfazListaSocial.ItemRanking(
+                            obj.optString("nombre", ""),
+                            (float) obj.optDouble("peso_maximo", 0)
+                    ));
+                } catch (Exception e) { e.printStackTrace(); }
             }
-        });
-        constructorDialogo.setNegativeButton("Cancelar", null);
-        constructorDialogo.show();
+
+            runOnUiThread(() -> {
+                listaRanking.clear();
+                listaRanking.addAll(lista);
+                adaptadorRanking.notifyDataSetChanged();
+            });
+        }).start();
     }
 
-    @SuppressLint("Range")
-    private void buscarYMostrarUsuario(String nombre) {
-        Cursor datosBD = gestorBD.getUserByName(nombre);
+    private void mostrarBuscarUsuario() {
+        EditText input = new EditText(this);
+        input.setHint("Nombre del usuario");
+        input.setPadding(50, 30, 50, 10);
 
-        if (datosBD != null && datosBD.moveToFirst()) {
-            int userId = datosBD.getInt(datosBD.getColumnIndex("id"));
-            String nombreUsuario = datosBD.getString(datosBD.getColumnIndex("nombre"));
-            datosBD.close();
+        new AlertDialog.Builder(this)
+                .setTitle("Buscar Usuario")
+                .setView(input)
+                .setPositiveButton("Buscar", (d, w) -> {
+                    String nombre = input.getText().toString().trim();
+                    if (nombre.isEmpty()) return;
 
-            mostrarEntrenamientosUsuario(userId, nombreUsuario);
-        } else {
-            Toast.makeText(this, "Usuario no encontrado", Toast.LENGTH_SHORT).show();
-            if (datosBD != null)
-                datosBD.close();
-        }
-    }
-
-    private void mostrarEntrenamientosUsuario(int userId, String nombreUsuario) {
-        // Solo mostramos entrenamientos PUBLICOS de otros usuarios
-        Cursor entrenamientos = gestorBD.getUserPublicTrainingsByUserId(userId);
-
-        if (entrenamientos == null || entrenamientos.getCount() == 0) {
-            Toast.makeText(this, nombreUsuario + " no tiene entrenamientos públicos", Toast.LENGTH_SHORT).show();
-            if (entrenamientos != null)
-                entrenamientos.close();
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Entrenamientos públicos de ").append(nombreUsuario).append(":\n\n");
-
-        int count = 0;
-        while (entrenamientos.moveToNext() && count < 10) {
-            @SuppressLint("Range")
-            String fecha = entrenamientos.getString(entrenamientos.getColumnIndex("date"));
-            @SuppressLint("Range")
-            long rutinaId = entrenamientos.getLong(entrenamientos.getColumnIndex("id"));
-
-            sb.append("📅 ").append(fecha).append("\n");
-
-            Cursor detalles = gestorBD.getTrainingDetails(rutinaId);
-            if (detalles != null && detalles.moveToFirst()) {
-                do {
-                    @SuppressLint("Range")
-                    String ejercicio = detalles.getString(detalles.getColumnIndex("nombre_ejercicio"));
-                    @SuppressLint("Range")
-                    int series = detalles.getInt(detalles.getColumnIndex("series"));
-                    @SuppressLint("Range")
-                    int repeticiones = detalles.getInt(detalles.getColumnIndex("repeticiones"));
-                    @SuppressLint("Range")
-                    double peso = detalles.getDouble(detalles.getColumnIndex("peso"));
-
-                    sb.append("  • ").append(ejercicio).append(": ")
-                            .append(series).append("x").append(repeticiones)
-                            .append(" - ").append(peso).append("kg\n");
-                } while (detalles.moveToNext());
-                detalles.close();
-            }
-            sb.append("\n");
-            count++;
-        }
-        entrenamientos.close();
-
-        if (count >= 10) {
-            sb.append("(Mostrando solo los primeros 10 entrenamientos)");
-        }
-
-        // Mostrar en un diálogo
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Perfil de " + nombreUsuario)
-                .setMessage(sb.toString())
-                .setPositiveButton("Cerrar", null)
+                    new Thread(() -> {
+                        JSONArray resultados = ClienteApi.obtenerInstancia().buscarUsuario(nombre);
+                        runOnUiThread(() -> {
+                            if (resultados.length() == 0) {
+                                Toast.makeText(this, "No se encontró ningún usuario", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            // Mostrar lista de usuarios encontrados
+                            String[] nombres = new String[resultados.length()];
+                            for (int i = 0; i < resultados.length(); i++) {
+                                nombres[i] = resultados.optJSONObject(i).optString("nombre", "") +
+                                        " (" + resultados.optJSONObject(i).optString("correo", "") + ")";
+                            }
+                            new AlertDialog.Builder(this)
+                                    .setTitle("Usuarios encontrados")
+                                    .setItems(nombres, (d2, idx) -> {
+                                        int userId = resultados.optJSONObject(idx).optInt("id", 0);
+                                        mostrarEntrenamientosPublicos(userId, nombres[idx]);
+                                    })
+                                    .show();
+                        });
+                    }).start();
+                })
+                .setNegativeButton("Cancelar", null)
                 .show();
+    }
+
+    private void mostrarEntrenamientosPublicos(int usuarioId, String nombreUsuario) {
+        new Thread(() -> {
+            JSONArray rutinas = ClienteApi.obtenerInstancia().obtenerRutinasPublicas(usuarioId);
+            runOnUiThread(() -> {
+                if (rutinas.length() == 0) {
+                    Toast.makeText(this, "No tiene entrenamientos públicos", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String[] items = new String[rutinas.length()];
+                for (int i = 0; i < rutinas.length(); i++) {
+                    items[i] = "Entrenamiento del " + rutinas.optJSONObject(i).optString("date", "");
+                }
+                new AlertDialog.Builder(this)
+                        .setTitle("Entrenos de " + nombreUsuario)
+                        .setItems(items, (d, idx) -> {
+                            long rutinaId = rutinas.optJSONObject(idx).optLong("id", 0);
+                            String fecha = rutinas.optJSONObject(idx).optString("date", "");
+                            new Thread(() -> {
+                                JSONArray detallesJson = ClienteApi.obtenerInstancia().obtenerDetallesRutina(rutinaId);
+                                java.util.List<Entrenamiento.EjercicioDetalle> listaDetalles = new java.util.ArrayList<>();
+                                for (int j = 0; j < detallesJson.length(); j++) {
+                                    JSONObject det = detallesJson.optJSONObject(j);
+                                    if (det != null) {
+                                        listaDetalles.add(new Entrenamiento.EjercicioDetalle(
+                                                det.optString("nombre_ejercicio", ""),
+                                                det.optInt("series", 0),
+                                                det.optDouble("peso", 0),
+                                                det.optInt("repeticiones", 0)
+                                        ));
+                                    }
+                                }
+                                Entrenamiento ent = new Entrenamiento(rutinaId, fecha, listaDetalles, true);
+                                runOnUiThread(() -> {
+                                    android.content.Intent intent = new android.content.Intent(PantallaSocial.this, PantallaDetalleEntrenamiento.class);
+                                    intent.putExtra("entrenamiento", ent);
+                                    startActivity(intent);
+                                });
+                            }).start();
+                        })
+                        .setPositiveButton("Cerrar", null)
+                        .show();
+            });
+        }).start();
     }
 }

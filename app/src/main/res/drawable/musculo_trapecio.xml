@@ -1,15 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="200dp"
-    android:height="300dp"
-    android:viewportWidth="200"
-    android:viewportHeight="300">
-    <!-- Body silhouette -->
+﻿<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:tint="?attr/colorPrimary"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
     <path
-        android:fillColor="#555555"
-        android:pathData="M100,20 C108,20 115,28 115,38 C115,48 108,55 100,55 C92,55 85,48 85,38 C85,28 92,20 100,20 Z M80,60 L70,62 L55,90 L60,92 L72,70 L75,130 L65,200 L60,280 L75,282 L90,210 L100,180 L110,210 L125,282 L140,280 L135,200 L125,130 L128,70 L140,92 L145,90 L130,62 L120,60 Z" />
-    <!-- Trapezius highlighted in red -->
-    <path
-        android:fillColor="#E53935"
-        android:pathData="M85,50 L75,58 L70,62 L80,60 L92,58 L100,56 L108,58 L120,60 L130,62 L125,58 L115,50 C110,52 105,54 100,54 C95,54 90,52 85,50 Z" />
+        android:fillColor="@android:color/white"
+        android:pathData="M20.57,14.86L22,13.43L20.57,12L17,15.57L8.43,7L12,3.43L10.57,2L9.14,3.43L7.71,2L5.57,4.14L4.14,2.71L2.71,4.14L4.14,5.57L2,7.71L3.43,9.14L2,10.57L3.43,12L7,8.43L15.57,17L12,20.57L13.43,22L14.86,20.57L16.29,22L18.43,19.86L19.86,21.29L21.29,19.86L19.86,18.43L22,16.29L20.57,14.86Z" />
 </vector>

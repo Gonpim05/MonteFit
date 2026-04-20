@@ -23,7 +23,14 @@ public class PantallaDetalleEntrenamiento extends AppCompatActivity {
         ListView lvEjercicios = findViewById(R.id.lvEjerciciosDetalle);
         TextView tvTotalKilos = findViewById(R.id.tvTotalKilos);
 
-        Entrenamiento entrenamiento = (Entrenamiento) getIntent().getSerializableExtra("entrenamiento");
+        Entrenamiento entrenamiento;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            entrenamiento = getIntent().getSerializableExtra("entrenamiento", Entrenamiento.class);
+        } else {
+            @SuppressWarnings("deprecation")
+            Entrenamiento oldEntrenamiento = (Entrenamiento) getIntent().getSerializableExtra("entrenamiento");
+            entrenamiento = oldEntrenamiento;
+        }
 
         if (entrenamiento != null) {
             tvTitulo.setText("📋 Detalle del " + entrenamiento.getFecha());
@@ -32,9 +39,10 @@ public class PantallaDetalleEntrenamiento extends AppCompatActivity {
             java.util.List<String> displayList = new java.util.ArrayList<>();
 
             for (Entrenamiento.EjercicioDetalle ed : entrenamiento.getEjerciciosDetalle()) {
-                String elemento = "💪 " + ed.nombre + ": " + ed.series + " series x " + ed.peso + " kg";
+                String elemento = "💪 " + ed.nombre + " (Set " + ed.series + "): " + ed.peso + " kg x " + ed.repeticiones + " reps";
                 displayList.add(elemento);
-                totalPeso += (ed.series * ed.peso);
+                // Calculamos el volumen real: Peso x Repeteciones de cada serie
+                totalPeso += (ed.peso * ed.repeticiones);
             }
 
             ArrayAdapter<String> miAdaptador = new ArrayAdapter<>(this,

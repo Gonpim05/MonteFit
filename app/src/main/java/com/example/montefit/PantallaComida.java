@@ -1,21 +1,28 @@
 package com.example.montefit;
 
-import android.database.Cursor;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class PantallaComida extends AppCompatActivity implements InterfazListaAlimentos.OnFoodClickListener {
+public class PantallaComida extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private InterfazListaAlimentos miAdaptador;
-    private List<Alimento> listaAlimentos;
-    private GestorBaseDatos gestorBD;
+    private RecyclerView rvComida;
+    private InterfazListaAlimentos adaptador;
+    private List<Alimento> listaAlimentos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,152 +30,176 @@ public class PantallaComida extends AppCompatActivity implements InterfazListaAl
         EdgeToEdge.enable(this);
         setContentView(R.layout.pantalla_comida);
 
-        gestorBD = GestorUsuarios.getInstance().getDbHelper();
-        if (gestorBD == null) {
-            GestorUsuarios.getInstance().init(this);
-            gestorBD = GestorUsuarios.getInstance().getDbHelper();
-        }
+        rvComida = findViewById(R.id.rvComida);
+        rvComida.setLayoutManager(new LinearLayoutManager(this));
 
-        recyclerView = findViewById(R.id.rvComida);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        listaAlimentos = new ArrayList<>();
-        miAdaptador = new InterfazListaAlimentos(listaAlimentos, this);
-        recyclerView.setAdapter(miAdaptador);
+        adaptador = new InterfazListaAlimentos(listaAlimentos, alimento -> mostrarOpcionesAlimento(alimento));
+        rvComida.setAdapter(adaptador);
 
-        findViewById(R.id.fabAddComida).setOnClickListener(v -> showAddFoodDialog(null));
-
-        loadFoods();
-    }
-
-    private void loadFoods() {
-        listaAlimentos.clear();
-        Cursor datosBD = gestorBD.getAllFoods();
-        if (datosBD != null && datosBD.moveToFirst()) {
-            do {
-                int id = datosBD.getInt(datosBD.getColumnIndexOrThrow("id"));
-                String nombre = datosBD.getString(datosBD.getColumnIndexOrThrow("nombre"));
-                int calorias = datosBD.getInt(datosBD.getColumnIndexOrThrow("calorias"));
-                double proteinas = datosBD.getDouble(datosBD.getColumnIndexOrThrow("proteinas"));
-                double carbohidratos = datosBD.getDouble(datosBD.getColumnIndexOrThrow("carbohidratos"));
-                double grasas = datosBD.getDouble(datosBD.getColumnIndexOrThrow("grasas"));
-                listaAlimentos.add(new Alimento(id, nombre, calorias, proteinas, carbohidratos, grasas));
-            } while (datosBD.moveToNext());
-            datosBD.close();
-        }
-        miAdaptador.notifyDataSetChanged();
+        FloatingActionButton fabAdd = findViewById(R.id.fabAddComida);
+        fabAdd.setOnClickListener(v -> mostrarDialogoAnadir());
     }
 
     @Override
-    public void onDeleteClick(Alimento Alimento) {
-        showFoodOptionsDialog(Alimento);
+    protected void onResume() {
+        super.onResume();
+        cargarComidas();
     }
 
-    private void showFoodOptionsDialog(Alimento Alimento) {
-        String[] opciones = { "Editar", "Eliminar" };
-        new android.app.AlertDialog.Builder(this)
-                .setTitle(Alimento.getName())
-                .setItems(opciones, (miDialogo, which) -> {
-                    if (which == 0) {
-                        showAddFoodDialog(Alimento);
-                    } else {
-                        new android.app.AlertDialog.Builder(this)
-                                .setTitle("Eliminar " + Alimento.getName() + "?")
-                                .setPositiveButton("Sí", (d, w) -> {
-                                    if (gestorBD.deleteFood(Alimento.getId())) {
-                                        Toast.makeText(this, "Eliminado", Toast.LENGTH_SHORT).show();
-                                        loadFoods();
-                                    }
-                                })
-                                .setNegativeButton("No", null)
-                                .show();
-                    }
+    private void cargarComidas() {
+        new Thread(() -> {
+            JSONArray datos = ClienteApi.obtenerInstancia().obtenerComidas();
+            List<Alimento> lista = new ArrayList<>();
+
+            for (int i = 0; i < datos.length(); i++) {
+                try {
+                    JSONObject obj = datos.getJSONObject(i);
+                    lista.add(new Alimento(
+                            obj.optInt("id", 0),
+                            obj.optString("nombre", ""),
+                            obj.optInt("calorias", 0),
+                            obj.optDouble("proteinas", 0),
+                            obj.optDouble("carbohidratos", 0),
+                            obj.optDouble("grasas", 0)
+                    ));
+                } catch (Exception e) { e.printStackTrace(); }
+            }
+
+            runOnUiThread(() -> {
+                listaAlimentos.clear();
+                listaAlimentos.addAll(lista);
+                adaptador.notifyDataSetChanged();
+            });
+        }).start();
+    }
+
+    private void mostrarDialogoAnadir() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Añadir Comida");
+
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 30, 50, 10);
+
+        EditText inputNombre = new EditText(this);
+        inputNombre.setHint("Nombre del alimento");
+        layout.addView(inputNombre);
+
+        EditText inputCal = new EditText(this);
+        inputCal.setHint("Calorías");
+        inputCal.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputCal);
+
+        EditText inputProt = new EditText(this);
+        inputProt.setHint("Proteínas (g)");
+        inputProt.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputProt);
+
+        EditText inputCarb = new EditText(this);
+        inputCarb.setHint("Carbohidratos (g)");
+        inputCarb.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputCarb);
+
+        EditText inputGras = new EditText(this);
+        inputGras.setHint("Grasas (g)");
+        inputGras.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputGras);
+
+        builder.setView(layout);
+        builder.setPositiveButton("Guardar", (d, w) -> {
+            String correo = GestorUsuarios.getInstance().getCorreoActual();
+            String nombre = inputNombre.getText().toString().trim();
+            int cal = 0;
+            double prot = 0, carb = 0, gras = 0;
+            try { cal = Integer.parseInt(inputCal.getText().toString().trim()); } catch (Exception ignored) {}
+            try { prot = Double.parseDouble(inputProt.getText().toString().trim()); } catch (Exception ignored) {}
+            try { carb = Double.parseDouble(inputCarb.getText().toString().trim()); } catch (Exception ignored) {}
+            try { gras = Double.parseDouble(inputGras.getText().toString().trim()); } catch (Exception ignored) {}
+
+            int finalCal = cal;
+            double finalProt = prot, finalCarb = carb, finalGras = gras;
+            new Thread(() -> {
+                ClienteApi.obtenerInstancia().guardarComida(nombre, correo, finalCal, finalProt, finalCarb, finalGras);
+                runOnUiThread(this::cargarComidas);
+            }).start();
+        });
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    private void mostrarOpcionesAlimento(Alimento alimento) {
+        new AlertDialog.Builder(this)
+                .setTitle(alimento.getName())
+                .setItems(new String[]{"Editar", "Eliminar"}, (d, w) -> {
+                    if (w == 0) mostrarDialogoEditar(alimento);
+                    else eliminarAlimento(alimento);
                 })
                 .show();
     }
 
-    private void showAddFoodDialog(Alimento existente) {
-        boolean editing = existente != null;
-        android.app.AlertDialog.Builder constructorDialogo = new android.app.AlertDialog.Builder(this);
-        constructorDialogo.setTitle(editing ? "Editar Comida" : "Añadir Comida");
+    private void mostrarDialogoEditar(Alimento alimento) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Editar Comida");
 
-        android.widget.LinearLayout contenedor = new android.widget.LinearLayout(this);
-        contenedor.setOrientation(android.widget.LinearLayout.VERTICAL);
-        contenedor.setPadding(50, 30, 50, 10);
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        layout.setPadding(50, 30, 50, 10);
 
-        final android.widget.EditText inputName = new android.widget.EditText(this);
-        inputName.setHint("Nombre");
-        inputName.setTextColor(android.graphics.Color.WHITE);
-        inputName.setHintTextColor(android.graphics.Color.LTGRAY);
-        if (editing)
-            inputName.setText(existente.getName());
-        contenedor.addView(inputName);
+        EditText inputNombre = new EditText(this);
+        inputNombre.setText(alimento.getName());
+        layout.addView(inputNombre);
 
-        final android.widget.EditText inputKcal = new android.widget.EditText(this);
-        inputKcal.setHint("Calorías");
-        inputKcal.setTextColor(android.graphics.Color.WHITE);
-        inputKcal.setHintTextColor(android.graphics.Color.LTGRAY);
-        inputKcal.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        if (editing)
-            inputKcal.setText(String.valueOf(existente.getKcal()));
-        contenedor.addView(inputKcal);
+        EditText inputCal = new EditText(this);
+        inputCal.setText(String.valueOf(alimento.getKcal()));
+        inputCal.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputCal);
 
-        final android.widget.EditText inputProt = new android.widget.EditText(this);
-        inputProt.setHint("Proteínas (g)");
-        inputProt.setTextColor(android.graphics.Color.WHITE);
-        inputProt.setHintTextColor(android.graphics.Color.LTGRAY);
-        inputProt.setInputType(
-                android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        if (editing)
-            inputProt.setText(String.valueOf(existente.getProtein()));
-        contenedor.addView(inputProt);
+        EditText inputProt = new EditText(this);
+        inputProt.setText(String.valueOf(alimento.getProtein()));
+        inputProt.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputProt);
 
-        final android.widget.EditText inputCarb = new android.widget.EditText(this);
-        inputCarb.setHint("Carbohidratos (g)");
-        inputCarb.setTextColor(android.graphics.Color.WHITE);
-        inputCarb.setHintTextColor(android.graphics.Color.LTGRAY);
-        inputCarb.setInputType(
-                android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        if (editing)
-            inputCarb.setText(String.valueOf(existente.getCarbs()));
-        contenedor.addView(inputCarb);
+        EditText inputCarb = new EditText(this);
+        inputCarb.setText(String.valueOf(alimento.getCarbs()));
+        inputCarb.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputCarb);
 
-        final android.widget.EditText inputFat = new android.widget.EditText(this);
-        inputFat.setHint("Grasas (g)");
-        inputFat.setTextColor(android.graphics.Color.WHITE);
-        inputFat.setHintTextColor(android.graphics.Color.LTGRAY);
-        inputFat.setInputType(
-                android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
-        if (editing)
-            inputFat.setText(String.valueOf(existente.getFats()));
-        contenedor.addView(inputFat);
+        EditText inputGras = new EditText(this);
+        inputGras.setText(String.valueOf(alimento.getFats()));
+        inputGras.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        layout.addView(inputGras);
 
-        constructorDialogo.setView(contenedor);
-        constructorDialogo.setPositiveButton("Guardar", (miDialogo, which) -> {
-            try {
-                String nombre = inputName.getText().toString();
-                int kcal = Integer.parseInt(inputKcal.getText().toString());
-                double prot = Double.parseDouble(inputProt.getText().toString());
-                double carb = Double.parseDouble(inputCarb.getText().toString());
-                double fat = Double.parseDouble(inputFat.getText().toString());
+        builder.setView(layout);
+        builder.setPositiveButton("Guardar", (d, w) -> {
+            String nombre = inputNombre.getText().toString().trim();
+            int cal = 0;
+            double prot = 0, carb = 0, gras = 0;
+            try { cal = Integer.parseInt(inputCal.getText().toString().trim()); } catch (Exception ignored) {}
+            try { prot = Double.parseDouble(inputProt.getText().toString().trim()); } catch (Exception ignored) {}
+            try { carb = Double.parseDouble(inputCarb.getText().toString().trim()); } catch (Exception ignored) {}
+            try { gras = Double.parseDouble(inputGras.getText().toString().trim()); } catch (Exception ignored) {}
 
-                boolean ok;
-                if (editing) {
-                    ok = gestorBD.updateFood(existente.getId(), nombre, kcal, prot, carb, fat);
-                } else {
-                    ok = gestorBD.addFood(nombre, kcal, prot, carb, fat);
-                }
-
-                if (ok) {
-                    Toast.makeText(this, editing ? "Actualizado" : "Comida añadida", Toast.LENGTH_SHORT).show();
-                    loadFoods();
-                } else {
-                    Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
-                }
-            } catch (Exception e) {
-                Toast.makeText(this, "Datos inválidos", Toast.LENGTH_SHORT).show();
-            }
+            int fCal = cal; double fProt = prot, fCarb = carb, fGras = gras;
+            new Thread(() -> {
+                ClienteApi.obtenerInstancia().editarComida(alimento.getId(), nombre, fCal, fProt, fCarb, fGras);
+                runOnUiThread(this::cargarComidas);
+            }).start();
         });
-        constructorDialogo.setNegativeButton("Cancelar", null);
-        constructorDialogo.show();
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    private void eliminarAlimento(Alimento alimento) {
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar")
+                .setMessage("¿Eliminar " + alimento.getName() + "?")
+                .setPositiveButton("Eliminar", (d, w) -> {
+                    new Thread(() -> {
+                        ClienteApi.obtenerInstancia().eliminarComida(alimento.getId());
+                        runOnUiThread(this::cargarComidas);
+                    }).start();
+                })
+                .setNegativeButton("Cancelar", null)
+                .show();
     }
 }

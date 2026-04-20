@@ -1,57 +1,73 @@
 package com.example.montefit;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.widget.Toast;
-import androidx.activity.EdgeToEdge;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class PantallaLogros extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
-    private GestorBaseDatos gestorBD;
+    private RecyclerView recyclerLogros;
+    private InterfazListaLogros adaptador;
+    private List<InterfazListaLogros.Logro> listaLogros = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.pantalla_logros);
 
-        gestorBD = GestorUsuarios.getInstance().getDbHelper();
-        if (gestorBD == null) {
-            GestorUsuarios.getInstance().init(this);
-            gestorBD = GestorUsuarios.getInstance().getDbHelper();
-        }
+        recyclerLogros = findViewById(R.id.recyclerLogros);
+        recyclerLogros.setLayoutManager(new LinearLayoutManager(this));
+        adaptador = new InterfazListaLogros(this, listaLogros);
+        recyclerLogros.setAdapter(adaptador);
 
-        recyclerView = findViewById(R.id.recyclerLogros);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        cargarLogros();
+    }
 
-        // Get ID of current user
-        String correoUsuario = GestorUsuarios.getInstance().getCurrentUserEmail();
-        if (correoUsuario == null || correoUsuario.isEmpty()) {
-            Toast.makeText(this, "No hay usuario logueado", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
+    private void cargarLogros() {
+        int userId = GestorUsuarios.getInstance().getUsuarioId();
+        if (userId <= 0) {
+            // Intenta obtenerlo
+            String correo = GestorUsuarios.getInstance().getCorreoActual();
+            if (correo == null) return;
 
-        int userId = gestorBD.getUserId(correoUsuario);
-        if (userId != -1) {
-            loadAchievements(userId);
+            new Thread(() -> {
+                int id = ClienteApi.obtenerInstancia().obtenerUsuarioId(correo);
+                GestorUsuarios.getInstance().setUsuarioId(id);
+                cargarLogrosDesdeApi(id);
+            }).start();
         } else {
-            Toast.makeText(this, "Usuario no encontrado", Toast.LENGTH_SHORT).show();
-            finish();
+            new Thread(() -> cargarLogrosDesdeApi(userId)).start();
         }
     }
 
-    private void loadAchievements(int userId) {
-        Cursor datosBD = gestorBD.getLogros(userId);
-        if (datosBD != null && datosBD.getCount() > 0) {
-            InterfazListaLogros miAdaptador = new InterfazListaLogros(this, datosBD);
-            recyclerView.setAdapter(miAdaptador);
-        } else {
-            Toast.makeText(this, "No hay logros disponibles", Toast.LENGTH_SHORT).show();
+    private void cargarLogrosDesdeApi(int userId) {
+        JSONArray datos = ClienteApi.obtenerInstancia().obtenerLogros(userId);
+        List<InterfazListaLogros.Logro> lista = new ArrayList<>();
+
+        for (int i = 0; i < datos.length(); i++) {
+            try {
+                JSONObject obj = datos.getJSONObject(i);
+                lista.add(new InterfazListaLogros.Logro(
+                        obj.optString("titulo", ""),
+                        obj.optString("descripcion", ""),
+                        obj.optInt("obtenido", 0) > 0
+                ));
+            } catch (Exception e) { e.printStackTrace(); }
         }
+
+        runOnUiThread(() -> {
+            listaLogros.clear();
+            listaLogros.addAll(lista);
+            adaptador.notifyDataSetChanged();
+        });
     }
 }
