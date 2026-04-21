@@ -7,13 +7,6 @@
     android:gravity="center_vertical"
     android:background="?android:attr/colorBackground">
 
-    <ImageView
-        android:id="@+id/ivIconoMusculo"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="Icono"
-        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/tvNombreMusculo"

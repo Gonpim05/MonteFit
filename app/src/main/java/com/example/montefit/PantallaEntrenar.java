@@ -48,28 +48,27 @@ public class PantallaEntrenar extends AppCompatActivity {
         rvSesion = findViewById(R.id.rvTrainingSession);
         rvSesion.setLayoutManager(new LinearLayoutManager(this));
 
-        adaptadorSesion = new InterfazListaEjerciciosSesion(listaSesion, new InterfazListaEjerciciosSesion.OnItemClickListener() {
-            @Override
-            public void onItemClick(int posicion) {
-                mostrarOpcionesSerie(posicion);
-            }
+        adaptadorSesion = new InterfazListaEjerciciosSesion(listaSesion,
+                new InterfazListaEjerciciosSesion.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int posicion) {
+                        mostrarOpcionesSerie(posicion);
+                    }
 
-            @Override
-            public void onItemLongClick(int posicion) {
-                confirmarEliminarEjercicio(posicion);
-            }
-        });
+                    @Override
+                    public void onItemLongClick(int posicion) {
+                        confirmarEliminarEjercicio(posicion);
+                    }
+                });
         rvSesion.setAdapter(adaptadorSesion);
 
         androidx.appcompat.widget.SwitchCompat switchPublico = findViewById(R.id.switchPublico);
         switchPublico.setChecked(true);
         switchPublico.setOnCheckedChangeListener((btn, checked) -> sesionPublica = checked);
 
-        // FAB añadir ejercicio
         ExtendedFloatingActionButton fabAdd = findViewById(R.id.fabAddExercise);
         fabAdd.setOnClickListener(v -> mostrarDialogoEjercicio());
 
-        // Botón finalizar
         MaterialButton btnFinalizar = findViewById(R.id.btnFinalizarEntreno);
         btnFinalizar.setOnClickListener(v -> finalizarEntrenamiento());
     }
@@ -78,27 +77,12 @@ public class PantallaEntrenar extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Seleccionar área o acción");
 
-        // Adaptador personalizado para mostrar los dibujos musculares
-        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<String>(this, R.layout.item_grupo_muscular, R.id.tvNombreMusculo, GRUPOS_MUSCULARES) {
+        android.widget.ArrayAdapter<String> adapter = new android.widget.ArrayAdapter<String>(this,
+                R.layout.item_grupo_muscular, R.id.tvNombreMusculo, GRUPOS_MUSCULARES) {
             @Override
             public View getView(int position, View convertView, android.view.ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-                android.widget.ImageView icono = view.findViewById(R.id.ivIconoMusculo);
-                String nombre = GRUPOS_MUSCULARES[position];
 
-                if (nombre.contains("➕")) {
-                    icono.setImageResource(android.R.drawable.ic_menu_add);
-                } else {
-                    String nombreResource = "musculo_" + nombre.toLowerCase()
-                            .replace("í", "i")
-                            .replace("ú", "u");
-                    int resId = getResources().getIdentifier(nombreResource, "drawable", getPackageName());
-                    if (resId != 0) {
-                        icono.setImageResource(resId);
-                    } else {
-                        icono.setImageDrawable(null); // No mostrar nada si no hay icono
-                    }
-                }
                 return view;
             }
         };
@@ -120,9 +104,10 @@ public class PantallaEntrenar extends AppCompatActivity {
                         listaEj.add(new Ejercicio(
                                 obj.optInt("id", 0),
                                 obj.optString("nombre", ""),
-                                obj.optString("parte_cuerpo", "")
-                        ));
-                    } catch (Exception e) { e.printStackTrace(); }
+                                obj.optString("parte_cuerpo", "")));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 runOnUiThread(() -> {
@@ -132,22 +117,18 @@ public class PantallaEntrenar extends AppCompatActivity {
                     }
 
                     String[] nombres = new String[listaEj.size()];
-                    for (int i = 0; i < listaEj.size(); i++) nombres[i] = listaEj.get(i).getName();
+                    for (int i = 0; i < listaEj.size(); i++)
+                        nombres[i] = listaEj.get(i).getName();
 
-                    android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_ejercicios_maniqui, null);
-                    android.widget.ImageView ivManiqui = dialogView.findViewById(R.id.ivManiqui);
+                    android.view.View dialogView = getLayoutInflater().inflate(R.layout.dialog_ejercicios_maniqui,
+                            null);
                     android.widget.ListView lvEjercicios = dialogView.findViewById(R.id.lvEjerciciosDialog);
                     android.widget.TextView tvTitulo = dialogView.findViewById(R.id.tvTituloDialog);
-                    
-                    tvTitulo.setText("Ejercicios de " + grupoSeleccionado);
-                    
-                    String muscId = "maniqui_" + grupoSeleccionado.toLowerCase()
-                            .replace("í", "i")
-                            .replace("ú", "u");
-                    int resId = getResources().getIdentifier(muscId, "drawable", getPackageName());
-                    if (resId != 0) ivManiqui.setImageResource(resId);
 
-                    android.widget.ArrayAdapter<String> adapterEjercicios = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_list_item_1, nombres);
+                    tvTitulo.setText("Ejercicios de " + grupoSeleccionado);
+
+                    android.widget.ArrayAdapter<String> adapterEjercicios = new android.widget.ArrayAdapter<>(this,
+                            android.R.layout.simple_list_item_1, nombres);
                     lvEjercicios.setAdapter(adapterEjercicios);
 
                     androidx.appcompat.app.AlertDialog dialog = new androidx.appcompat.app.AlertDialog.Builder(this)
@@ -178,7 +159,7 @@ public class PantallaEntrenar extends AppCompatActivity {
 
         builder.setPositiveButton("Añadir", (d, w) -> {
             String nombre = inputNombre.getText().toString().trim();
-            if(!nombre.isEmpty()) {
+            if (!nombre.isEmpty()) {
                 Ejercicio customEj = new Ejercicio(-1, nombre, "Personalizado");
                 EjercicioSesion nuevo = new EjercicioSesion(customEj);
                 listaSesion.add(nuevo);
@@ -191,7 +172,7 @@ public class PantallaEntrenar extends AppCompatActivity {
     }
 
     private void mostrarOpcionesSerie(int posicion) {
-        String[] opciones = {"Añadir Serie", "Deshacer / Quitar última serie", "Eliminar Ejercicio Completo"};
+        String[] opciones = { "Añadir Serie", "Deshacer / Quitar última serie", "Eliminar Ejercicio Completo" };
         new AlertDialog.Builder(this)
                 .setTitle("Opciones del Ejercicio")
                 .setItems(opciones, (d, idx) -> {
@@ -228,7 +209,8 @@ public class PantallaEntrenar extends AppCompatActivity {
 
         EditText inputPeso = new EditText(this);
         inputPeso.setHint("Peso (kg)");
-        inputPeso.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        inputPeso.setInputType(
+                android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(inputPeso);
 
         builder.setView(layout);
@@ -290,8 +272,7 @@ public class PantallaEntrenar extends AppCompatActivity {
                             ej.getEjercicio().getName(),
                             numSerie,
                             serie.repeticiones,
-                            serie.peso
-                    );
+                            serie.peso);
                     numSerie++;
                 }
             }

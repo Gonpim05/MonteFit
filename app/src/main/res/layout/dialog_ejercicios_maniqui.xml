@@ -16,13 +16,6 @@
         android:textStyle="bold"
         android:layout_marginBottom="16dp" />
 
-    <!-- Imagen del Maniquí -->
-    <ImageView
-        android:id="@+id/ivManiqui"
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:scaleType="fitCenter"
-        android:layout_marginBottom="16dp" />
 
     <!-- Lista de ejercicios -->
     <ListView

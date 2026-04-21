@@ -35,7 +35,7 @@ public class PantallaInicial extends AppCompatActivity {
         adaptador = new InterfazListaEntrenamientos(this, listaEntrenamientos, this::confirmarEliminar);
         rvEntrenamientos.setAdapter(adaptador);
 
-        // Botones de navegación (como View para evitar ClassCastException, ya que btnPerfil ahora es un TextView)
+
         android.view.View btnEntrenar = findViewById(R.id.btnEntrenar);
         android.view.View btnComida = findViewById(R.id.btnComida);
         android.view.View btnLogros = findViewById(R.id.btnLogros);
@@ -48,7 +48,6 @@ public class PantallaInicial extends AppCompatActivity {
         btnSocial.setOnClickListener(v -> startActivity(new Intent(this, PantallaSocial.class)));
         btnPerfil.setOnClickListener(v -> startActivity(new Intent(this, PantallaPerfil.class)));
 
-        // Saludo personalizado con el nombre de usuario
         TextView tvGreeting = findViewById(R.id.tvGreeting);
         String correo = GestorUsuarios.getInstance().getCorreoActual();
         if (correo != null) {
@@ -86,7 +85,6 @@ public class PantallaInicial extends AppCompatActivity {
                     String fecha = obj.optString("date", "");
                     boolean publico = obj.optInt("es_publico", 1) == 1;
 
-                    // Cargar detalles del entrenamiento
                     JSONArray detalles = ClienteApi.obtenerInstancia().obtenerDetallesRutina(id);
                     List<Entrenamiento.EjercicioDetalle> listaDetalles = new ArrayList<>();
                     for (int j = 0; j < detalles.length(); j++) {

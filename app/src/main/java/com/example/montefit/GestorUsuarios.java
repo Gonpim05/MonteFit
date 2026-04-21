@@ -2,8 +2,6 @@ package com.example.montefit;
 
 /**
  * Singleton que guarda el estado del usuario actual.
- * Ya NO usa GestorBaseDatos (SQLite). Ahora solo guarda el correo del usuario logueado.
- * Las pantallas usan ClienteApi directamente para acceder a MySQL.
  */
 public class GestorUsuarios {
 

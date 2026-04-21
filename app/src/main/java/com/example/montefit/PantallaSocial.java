@@ -42,7 +42,7 @@ public class PantallaSocial extends AppCompatActivity {
         java.util.Calendar cal = java.util.Calendar.getInstance();
         tvSemana.setText("Semana " + cal.get(java.util.Calendar.WEEK_OF_YEAR) + " - " + cal.get(java.util.Calendar.YEAR));
 
-        // Cargar ejercicios en el spinner
+
         new Thread(() -> {
             JSONArray ejercicios = ClienteApi.obtenerInstancia().obtenerTodosEjercicios();
             List<String> nombresEj = new ArrayList<>();
@@ -72,7 +72,7 @@ public class PantallaSocial extends AppCompatActivity {
             });
         }).start();
 
-        // Buscar usuario
+
         findViewById(R.id.btnBuscarUsuario).setOnClickListener(v -> mostrarBuscarUsuario());
     }
 
@@ -122,7 +122,7 @@ public class PantallaSocial extends AppCompatActivity {
                                 Toast.makeText(this, "No se encontró ningún usuario", Toast.LENGTH_SHORT).show();
                                 return;
                             }
-                            // Mostrar lista de usuarios encontrados
+
                             String[] nombres = new String[resultados.length()];
                             for (int i = 0; i < resultados.length(); i++) {
                                 nombres[i] = resultados.optJSONObject(i).optString("nombre", "") +

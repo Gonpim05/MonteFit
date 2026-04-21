@@ -13,21 +13,10 @@ import java.util.Map;
 import java.util.HashMap;
 
 /**
- * ClienteApi - Conecta la app Android con la API PHP de WAMP (montefit_api).
- * Reemplaza completamente a GestorBaseDatos (SQLite).
- * Todos los métodos son SINCRÓNICOS - llamar SIEMPRE desde un hilo secundario.
- *
- * Endpoints de tu API:
- *   usuarios.php?action=login|check|getId|getName|getProfile|buscar|register|update|updatePass
- *   ejercicios.php?action=getAll|getByGrupo|add|update|delete
- *   comidas.php?action=getAll|add|update|delete
- *   rutinas.php?action=getMias|getPublicas|getDetalles|isPublico|add|addDetalle|delete|toggle
- *   rankings.php?action=getRanking
- *   logros.php?action=getLogros
+ * ClienteApi - Conecta la app Android con la API PHP.
  */
 public class ClienteApi {
 
-    // IP real de tu PC en la red WiFi. Obligatorio para que funcione desde un móvil físico
     private static final String URL_BASE = "http://192.168.254.171/montefit_api/";
     private static final String TAG = "ClienteApi";
 
@@ -41,7 +30,6 @@ public class ClienteApi {
         return instancia;
     }
 
-    /** Devuelve el último error para depuración */
     public String getUltimoError() { return ultimoError; }
 
     // =============================================
@@ -119,7 +107,6 @@ public class ClienteApi {
     // USUARIOS (usuarios.php)
     // =============================================
 
-    /** Login: devuelve JSONObject con {ok:true/false, error:"..."} */
     public JSONObject iniciarSesion(String correo, String contrasena) {
         try {
             String url = "usuarios.php?action=login"
@@ -139,7 +126,6 @@ public class ClienteApi {
         }
     }
 
-    /** Comprueba si un correo ya existe */
     public boolean existeCorreo(String correo) {
         try {
             String url = "usuarios.php?action=check&correo=" + URLEncoder.encode(correo, "UTF-8");
