@@ -36,6 +36,9 @@ public class PantallaSocial extends AppCompatActivity {
         adaptadorRanking = new InterfazListaSocial(this, listaRanking);
         recyclerRanking.setAdapter(adaptadorRanking);
 
+        android.widget.ImageButton btnVolver = findViewById(R.id.btnVolver);
+        btnVolver.setOnClickListener(v -> finish());
+
         spinnerEjercicios = findViewById(R.id.spinnerEjerciciosRanking);
         TextView tvSemana = findViewById(R.id.tvSemanaActual);
 

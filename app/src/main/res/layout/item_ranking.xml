@@ -26,6 +26,12 @@
             android:textSize="16sp"
             android:gravity="center" />
 
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="12dp"
+            android:src="@drawable/ic_perfil_defecto" />
+
         <TextView
             android:id="@+id/txtNombreUsuario"
             android:layout_width="0dp"
@@ -35,7 +41,7 @@
             android:textSize="16sp"
             android:textColor="?android:attr/textColorPrimary"
             android:textStyle="bold"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="12dp" />
 
         <TextView
             android:id="@+id/txtPesoMax"

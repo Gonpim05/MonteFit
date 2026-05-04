@@ -48,6 +48,9 @@ public class PantallaEntrenar extends AppCompatActivity {
         rvSesion = findViewById(R.id.rvTrainingSession);
         rvSesion.setLayoutManager(new LinearLayoutManager(this));
 
+        android.widget.ImageButton btnVolver = findViewById(R.id.btnVolver);
+        btnVolver.setOnClickListener(v -> finish());
+
         adaptadorSesion = new InterfazListaEjerciciosSesion(listaSesion,
                 new InterfazListaEjerciciosSesion.OnItemClickListener() {
                     @Override
@@ -63,8 +66,13 @@ public class PantallaEntrenar extends AppCompatActivity {
         rvSesion.setAdapter(adaptadorSesion);
 
         androidx.appcompat.widget.SwitchCompat switchPublico = findViewById(R.id.switchPublico);
-        switchPublico.setChecked(true);
-        switchPublico.setOnCheckedChangeListener((btn, checked) -> sesionPublica = checked);
+        boolean ultimoEstado = PreferenciasApp.getUltimoEstadoPublico(this);
+        switchPublico.setChecked(ultimoEstado);
+        sesionPublica = ultimoEstado;
+        switchPublico.setOnCheckedChangeListener((btn, checked) -> {
+            sesionPublica = checked;
+            PreferenciasApp.saveUltimoEstadoPublico(PantallaEntrenar.this, checked);
+        });
 
         ExtendedFloatingActionButton fabAdd = findViewById(R.id.fabAddExercise);
         fabAdd.setOnClickListener(v -> mostrarDialogoEjercicio());
@@ -208,7 +216,7 @@ public class PantallaEntrenar extends AppCompatActivity {
         layout.addView(inputReps);
 
         EditText inputPeso = new EditText(this);
-        inputPeso.setHint("Peso (kg)");
+        inputPeso.setHint("Peso (" + (PreferenciasApp.usaLibras(this) ? "lbs" : "kg") + ")");
         inputPeso.setInputType(
                 android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
         layout.addView(inputPeso);
@@ -218,6 +226,9 @@ public class PantallaEntrenar extends AppCompatActivity {
             try {
                 int reps = Integer.parseInt(inputReps.getText().toString().trim());
                 double peso = Double.parseDouble(inputPeso.getText().toString().trim());
+                if (PreferenciasApp.usaLibras(PantallaEntrenar.this)) {
+                    peso = PreferenciasApp.convertirAkgDesdeUnidadActual(peso, true);
+                }
                 listaSesion.get(posicion).addSerie(reps, peso);
                 adaptadorSesion.notifyDataSetChanged();
             } catch (NumberFormatException e) {

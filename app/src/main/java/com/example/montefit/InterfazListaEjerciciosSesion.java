@@ -43,7 +43,7 @@ public class InterfazListaEjerciciosSesion extends RecyclerView.Adapter<Interfaz
         for (int i = 0; i < sets.size(); i++) {
             EjercicioSesion.DetalleSerie set = sets.get(i);
             setsInfo.append("Set ").append(i + 1).append(": ")
-                    .append(set.repeticiones).append("x").append(set.peso).append("kg");
+                    .append(set.repeticiones).append("x").append(PreferenciasApp.formatPeso(set.peso, filaVisor.itemView.getContext()));
             if (i < sets.size() - 1)
                 setsInfo.append(" | ");
         }

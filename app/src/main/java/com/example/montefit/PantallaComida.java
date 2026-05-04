@@ -33,6 +33,9 @@ public class PantallaComida extends AppCompatActivity {
         rvComida = findViewById(R.id.rvComida);
         rvComida.setLayoutManager(new LinearLayoutManager(this));
 
+        android.widget.ImageButton btnVolver = findViewById(R.id.btnVolver);
+        btnVolver.setOnClickListener(v -> finish());
+
         adaptador = new InterfazListaAlimentos(listaAlimentos, alimento -> mostrarOpcionesAlimento(alimento));
         rvComida.setAdapter(adaptador);
 

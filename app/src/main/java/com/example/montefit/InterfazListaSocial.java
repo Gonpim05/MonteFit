@@ -46,7 +46,7 @@ public class InterfazListaSocial extends RecyclerView.Adapter<InterfazListaSocia
 
         filaVisor.txtPosicion.setText("#" + (posicion + 1));
         filaVisor.txtNombre.setText(item.nombre);
-        filaVisor.txtPeso.setText(String.format("%.1f kg", item.pesoMaximo));
+        filaVisor.txtPeso.setText(PreferenciasApp.formatPeso(item.pesoMaximo, contexto));
     }
 
     @Override

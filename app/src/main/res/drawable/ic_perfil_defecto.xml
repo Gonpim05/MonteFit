@@ -1,0 +1,18 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Fondo circular gris claro -->
+    <path
+        android:fillColor="#C7C7CC"
+        android:pathData="M60,0C93.14,0 120,26.86 120,60C120,93.14 93.14,120 60,120C26.86,120 0,93.14 0,60C0,26.86 26.86,0 60,0Z"/>
+    <!-- Silueta de persona - cabeza -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,28c9.94,0 18,8.06 18,18s-8.06,18 -18,18 -18,-8.06 -18,-18 8.06,-18 18,-18z"/>
+    <!-- Silueta de persona - cuerpo -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,70c-20,0 -40,10 -40,22v8c11.18,12.41 27.22,20 45,20h0c15.72,-0.63 29.69,-7.22 40,-17.5v-10.5C105,80 80,70 60,70z"/>
+</vector>

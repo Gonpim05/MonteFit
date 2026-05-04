@@ -32,9 +32,7 @@ public class ClienteApi {
 
     public String getUltimoError() { return ultimoError; }
 
-    // =============================================
-    // MÉTODOS HTTP
-    // =============================================
+
 
     /** Petición GET con parámetros en la URL */
     private String peticionGET(String endpoint) {
@@ -199,8 +197,8 @@ public class ClienteApi {
         }
     }
 
-    /** Actualiza perfil (nombre, edad, peso, sexo) */
-    public boolean actualizarPerfil(String correo, String nombre, int edad, double peso, String sexo) {
+    /** Actualiza perfil (nombre, edad, peso, sexo, es_privado) */
+    public boolean actualizarPerfil(String correo, String nombre, int edad, double peso, String sexo, boolean esPrivado) {
         try {
             JSONObject body = new JSONObject();
             body.put("correo", correo);
@@ -208,6 +206,7 @@ public class ClienteApi {
             body.put("edad", edad);
             body.put("peso", peso);
             body.put("sexo", sexo);
+            body.put("es_privado", esPrivado ? 1 : 0);
             JSONObject resp = new JSONObject(peticionPOST("usuarios.php?action=update", body));
             return resp.optBoolean("ok", false);
         } catch (Exception e) {

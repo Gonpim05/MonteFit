@@ -29,6 +29,9 @@ public class PantallaLogros extends AppCompatActivity {
         adaptador = new InterfazListaLogros(this, listaLogros);
         recyclerLogros.setAdapter(adaptador);
 
+        android.widget.ImageButton btnVolver = findViewById(R.id.btnVolver);
+        btnVolver.setOnClickListener(v -> finish());
+
         cargarLogros();
     }
 

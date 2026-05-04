@@ -42,16 +42,16 @@
             app:layout_constraintTop_toBottomOf="@+id/tvGreeting"
             android:layout_marginTop="2dp" />
 
-        <TextView
+        <ImageView
             android:id="@+id/btnPerfil"
             android:layout_width="48dp"
             android:layout_height="48dp"
+            android:src="@drawable/ic_perfil_defecto"
+            android:scaleType="centerCrop"
             android:background="@drawable/boton_circular"
-            android:gravity="center"
-            android:text="👤"
-            android:textSize="24sp"
-            android:textColor="@color/white"
             android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/tvSubtitle" />
@@ -108,29 +108,55 @@
         android:layout_marginTop="4dp"
         app:layout_constraintTop_toBottomOf="@+id/guidelineBottom">
 
-        <Button
+        <LinearLayout
             android:id="@+id/btnEntrenar"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
             android:background="@drawable/boton_redondeado"
-            android:text="💪 Entrenar"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_entrenar"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Entrenar"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-        <Button
+        <LinearLayout
             android:id="@+id/btnComida"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
             android:background="@drawable/boton_secundario"
-            android:text="🍗 Comida"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_comida"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Comida"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout
@@ -143,29 +169,55 @@
         android:layout_marginTop="12dp"
         app:layout_constraintTop_toBottomOf="@+id/buttonRow1">
 
-        <Button
+        <LinearLayout
             android:id="@+id/btnLogros"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginEnd="6dp"
             android:background="@drawable/boton_secundario"
-            android:text="🏆 Logros"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_logros"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Logros"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
-        <Button
+        <LinearLayout
             android:id="@+id/btnSocial"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_weight="1"
             android:layout_marginStart="6dp"
             android:background="@drawable/boton_secundario"
-            android:text="📊 Social"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_social"
+                android:layout_marginEnd="8dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Social"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

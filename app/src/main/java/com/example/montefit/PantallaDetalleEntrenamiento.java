@@ -23,6 +23,9 @@ public class PantallaDetalleEntrenamiento extends AppCompatActivity {
         ListView lvEjercicios = findViewById(R.id.lvEjerciciosDetalle);
         TextView tvTotalKilos = findViewById(R.id.tvTotalKilos);
 
+        android.widget.ImageButton btnVolver = findViewById(R.id.btnVolver);
+        btnVolver.setOnClickListener(v -> finish());
+
         Entrenamiento entrenamiento;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             entrenamiento = getIntent().getSerializableExtra("entrenamiento", Entrenamiento.class);
@@ -39,9 +42,9 @@ public class PantallaDetalleEntrenamiento extends AppCompatActivity {
             java.util.List<String> displayList = new java.util.ArrayList<>();
 
             for (Entrenamiento.EjercicioDetalle ed : entrenamiento.getEjerciciosDetalle()) {
-                String elemento = "💪 " + ed.nombre + " (Set " + ed.series + "): " + ed.peso + " kg x " + ed.repeticiones + " reps";
+                String elemento = "💪 " + ed.nombre + " (Set " + ed.series + "): " + PreferenciasApp.formatPeso(ed.peso, this) + " x " + ed.repeticiones + " reps";
                 displayList.add(elemento);
-                // Calculamos el volumen real: Peso x Repeteciones de cada serie
+                // Calculamos el volumen real en kg primero
                 totalPeso += (ed.peso * ed.repeticiones);
             }
 
@@ -49,7 +52,7 @@ public class PantallaDetalleEntrenamiento extends AppCompatActivity {
                     android.R.layout.simple_list_item_1, displayList);
             lvEjercicios.setAdapter(miAdaptador);
 
-            tvTotalKilos.setText("🏋️ Total Kilos: " + String.format("%.1f", totalPeso) + " kg");
+            tvTotalKilos.setText("🏋️ Total Levantado: " + PreferenciasApp.formatPeso(totalPeso, this));
         } else {
             Toast.makeText(this, "Error al cargar entrenamiento", Toast.LENGTH_SHORT).show();
             finish();

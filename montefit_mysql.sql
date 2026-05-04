@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     edad INT DEFAULT 0,
     peso DOUBLE DEFAULT 0.0,
     sexo VARCHAR(20) DEFAULT '',
+    es_privado TINYINT(1) DEFAULT 0,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
