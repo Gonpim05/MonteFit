@@ -120,6 +120,24 @@ switch ($action) {
         );
         echo json_encode(['ok' => $ok]);
         break;
+    
+    // ── DELETE ACCOUNT ───────────────────────
+    case 'delete':
+        $body       = json_decode(file_get_contents('php://input'), true);
+        $correo     = $conn->real_escape_string($body['correo']    ?? '');
+        $contrasena = $conn->real_escape_string($body['contrasena'] ?? '');
+        
+        // Verificar contraseña antes de borrar
+        $check = $conn->query(
+            "SELECT 1 FROM Usuarios WHERE correo='$correo' AND contrasena='$contrasena'"
+        );
+        if ($check->num_rows > 0) {
+            $ok = $conn->query("DELETE FROM Usuarios WHERE correo='$correo'");
+            echo json_encode(['ok' => $ok]);
+        } else {
+            echo json_encode(['ok' => false, 'error' => 'Contraseña incorrecta']);
+        }
+        break;
 
     default:
         http_response_code(400);

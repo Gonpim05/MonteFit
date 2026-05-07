@@ -1,7 +1,4 @@
--- =============================================
--- MonteFit - Base de Datos MySQL
--- Equivalente a la base de datos SQLite de la app
--- =============================================
+
 
 CREATE DATABASE IF NOT EXISTS MonfitDB;
 USE MonfitDB;
@@ -95,10 +92,6 @@ CREATE TABLE IF NOT EXISTS Usuarios_Logros (
     UNIQUE KEY unique_usuario_logro (usuario_id, logro_id)
 ) ENGINE=InnoDB;
 
-
--- =============================================
--- DATOS DE EJEMPLO
--- =============================================
 
 -- Ejercicios (35 ejercicios, 11 grupos musculares)
 

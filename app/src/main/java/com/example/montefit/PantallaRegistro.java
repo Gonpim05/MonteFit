@@ -50,8 +50,10 @@ public class PantallaRegistro extends AppCompatActivity {
         botonRegistro.setEnabled(false);
         botonRegistro.setText("Registrando...");
 
+        String contrasenaHash = HashUtils.sha256(contrasena);
+
         new Thread(() -> {
-            JSONObject resp = ClienteApi.obtenerInstancia().registrarUsuario(nombre, correo, contrasena);
+            JSONObject resp = ClienteApi.obtenerInstancia().registrarUsuario(nombre, correo, contrasenaHash);
             boolean registroOk = resp.optBoolean("ok", false);
             String error = resp.optString("error", "Error al registrar usuario");
 

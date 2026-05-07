@@ -227,6 +227,19 @@ public class ClienteApi {
         }
     }
 
+    /** Elimina la cuenta del usuario */
+    public boolean eliminarCuenta(String correo, String contrasena) {
+        try {
+            JSONObject body = new JSONObject();
+            body.put("correo", correo);
+            body.put("contrasena", contrasena);
+            JSONObject resp = new JSONObject(peticionPOST("usuarios.php?action=delete", body));
+            return resp.optBoolean("ok", false);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     // =============================================
     // EJERCICIOS (ejercicios.php)
     // =============================================

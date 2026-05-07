@@ -47,8 +47,10 @@ public class PantallaPrincipal extends AppCompatActivity {
         botonLogin.setEnabled(false);
         botonLogin.setText("Conectando...");
 
+        String contrasenaHash = HashUtils.sha256(contrasena);
+
         new Thread(() -> {
-            JSONObject resp = ClienteApi.obtenerInstancia().iniciarSesion(correo, contrasena);
+            JSONObject resp = ClienteApi.obtenerInstancia().iniciarSesion(correo, contrasenaHash);
             boolean loginOk = resp.optBoolean("ok", false);
             String error = resp.optString("error", "Correo o contraseña incorrectos");
 

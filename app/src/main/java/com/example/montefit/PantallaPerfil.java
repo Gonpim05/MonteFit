@@ -18,7 +18,8 @@ public class PantallaPerfil extends AppCompatActivity {
 
     private ImageButton btnThemeToggle;
     private TextView tvNombre, tvEmail, tvDetails;
-    private MaterialButton btnEditar, btnCambiarContrasena;
+    private MaterialButton btnEditar, btnCambiarContrasena, btnBorrarCuenta;
+    private int intentosFallidos = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +33,7 @@ public class PantallaPerfil extends AppCompatActivity {
         tvDetails = findViewById(R.id.tvDetails);
         btnEditar = findViewById(R.id.btnEditarPerfil);
         btnCambiarContrasena = findViewById(R.id.btnCambiarContrasena);
+        btnBorrarCuenta = findViewById(R.id.btnBorrarCuenta);
         btnThemeToggle = findViewById(R.id.btnThemeToggle);
 
         ImageButton btnVolver = findViewById(R.id.btnVolver);
@@ -49,6 +51,7 @@ public class PantallaPerfil extends AppCompatActivity {
 
         btnEditar.setOnClickListener(v -> mostrarDialogoEditar());
         btnCambiarContrasena.setOnClickListener(v -> mostrarDialogoCambiarContrasena());
+        btnBorrarCuenta.setOnClickListener(v -> mostrarDialogoBorrarCuenta());
 
         androidx.appcompat.widget.SwitchCompat switchLibras = findViewById(R.id.switchLibras);
         switchLibras.setChecked(PreferenciasApp.usaLibras(this));
@@ -192,8 +195,10 @@ public class PantallaPerfil extends AppCompatActivity {
                 return;
             }
 
+            String hashNueva = HashUtils.sha256(nueva);
+
             new Thread(() -> {
-                boolean ok = ClienteApi.obtenerInstancia().cambiarContrasena(correo, nueva);
+                boolean ok = ClienteApi.obtenerInstancia().cambiarContrasena(correo, hashNueva);
                 runOnUiThread(() -> {
                     Toast.makeText(this, ok ? "Contraseña cambiada" : "Error", Toast.LENGTH_SHORT).show();
                 });
@@ -201,6 +206,52 @@ public class PantallaPerfil extends AppCompatActivity {
         });
         builder.setNegativeButton("Cancelar", null);
         builder.show();
+    }
+
+    private void mostrarDialogoBorrarCuenta() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Borrar Cuenta");
+        builder.setMessage("Para confirmar el borrado, introduce tu contraseña actual. Si fallas 2 veces, se cerrará la sesión.");
+
+        EditText inputPass = new EditText(this);
+        inputPass.setHint("Tu contraseña");
+        inputPass.setInputType(android.text.InputType.TYPE_CLASS_TEXT | android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        inputPass.setPadding(50, 30, 50, 10);
+        builder.setView(inputPass);
+
+        builder.setPositiveButton("Borrar Definitivamente", (d, w) -> {
+            String correo = GestorUsuarios.getInstance().getCorreoActual();
+            String pass = inputPass.getText().toString().trim();
+            String passHash = HashUtils.sha256(pass);
+
+            new Thread(() -> {
+                boolean ok = ClienteApi.obtenerInstancia().eliminarCuenta(correo, passHash);
+                runOnUiThread(() -> {
+                    if (ok) {
+                        Toast.makeText(this, "Cuenta eliminada correctamente", Toast.LENGTH_LONG).show();
+                        cerrarSesionYSalir();
+                    } else {
+                        intentosFallidos++;
+                        if (intentosFallidos >= 2) {
+                            Toast.makeText(this, "Demasiados intentos. Cerrando sesión.", Toast.LENGTH_LONG).show();
+                            cerrarSesionYSalir();
+                        } else {
+                            Toast.makeText(this, "Contraseña incorrecta. Intento 1/2", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }).start();
+        });
+        builder.setNegativeButton("Cancelar", null);
+        builder.show();
+    }
+
+    private void cerrarSesionYSalir() {
+        GestorUsuarios.getInstance().cerrarSesion();
+        android.content.Intent intent = new android.content.Intent(this, PantallaPrincipal.class);
+        intent.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void updateThemeIcon() {

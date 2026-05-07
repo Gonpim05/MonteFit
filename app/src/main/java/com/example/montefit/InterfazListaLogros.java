@@ -10,9 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-/**
- * Adaptador de logros - usa List en vez de Cursor (ya no depende de SQLite).
- */
+
 public class InterfazListaLogros extends RecyclerView.Adapter<InterfazListaLogros.ViewHolder> {
 
     private Context contexto;
