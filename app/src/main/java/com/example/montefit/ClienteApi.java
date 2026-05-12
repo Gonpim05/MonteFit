@@ -197,8 +197,8 @@ public class ClienteApi {
         }
     }
 
-    /** Actualiza perfil (nombre, edad, peso, sexo, es_privado) */
-    public boolean actualizarPerfil(String correo, String nombre, int edad, double peso, String sexo, boolean esPrivado) {
+    /** Actualiza perfil (nombre, edad, peso, sexo) */
+    public boolean actualizarPerfil(String correo, String nombre, int edad, double peso, String sexo) {
         try {
             JSONObject body = new JSONObject();
             body.put("correo", correo);
@@ -206,7 +206,6 @@ public class ClienteApi {
             body.put("edad", edad);
             body.put("peso", peso);
             body.put("sexo", sexo);
-            body.put("es_privado", esPrivado ? 1 : 0);
             JSONObject resp = new JSONObject(peticionPOST("usuarios.php?action=update", body));
             return resp.optBoolean("ok", false);
         } catch (Exception e) {
@@ -306,10 +305,11 @@ public class ClienteApi {
     // COMIDAS (comidas.php)
     // =============================================
 
-    /** Obtiene todas las comidas */
-    public JSONArray obtenerComidas() {
+    /** Obtiene las comidas del usuario (filtradas por correo) */
+    public JSONArray obtenerComidas(String correo) {
         try {
-            return new JSONArray(peticionGET("comidas.php?action=getAll"));
+            String url = "comidas.php?action=getAll&correo=" + URLEncoder.encode(correo, "UTF-8");
+            return new JSONArray(peticionGET(url));
         } catch (Exception e) {
             return new JSONArray();
         }

@@ -50,8 +50,11 @@ public class PantallaComida extends AppCompatActivity {
     }
 
     private void cargarComidas() {
+        String correo = GestorUsuarios.getInstance().getCorreoActual();
+        if (correo == null) return;
+
         new Thread(() -> {
-            JSONArray datos = ClienteApi.obtenerInstancia().obtenerComidas();
+            JSONArray datos = ClienteApi.obtenerInstancia().obtenerComidas(correo);
             List<Alimento> lista = new ArrayList<>();
 
             for (int i = 0; i < datos.length(); i++) {

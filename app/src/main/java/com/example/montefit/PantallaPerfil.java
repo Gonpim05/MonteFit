@@ -18,8 +18,13 @@ public class PantallaPerfil extends AppCompatActivity {
 
     private ImageButton btnThemeToggle;
     private TextView tvNombre, tvEmail, tvDetails;
-    private MaterialButton btnEditar, btnCambiarContrasena, btnBorrarCuenta;
+    private MaterialButton btnEditar, btnCambiarContrasena, btnBorrarCuenta, btnCerrarSesion;
     private int intentosFallidos = 0;
+    // Valores actuales del perfil (para pre-rellenar el diálogo de edición)
+    private String currentNombre = "";
+    private int currentEdad = 0;
+    private double currentPeso = 0;
+    private String currentSexo = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +39,7 @@ public class PantallaPerfil extends AppCompatActivity {
         btnEditar = findViewById(R.id.btnEditarPerfil);
         btnCambiarContrasena = findViewById(R.id.btnCambiarContrasena);
         btnBorrarCuenta = findViewById(R.id.btnBorrarCuenta);
+        btnCerrarSesion = findViewById(R.id.btnCerrarSesion);
         btnThemeToggle = findViewById(R.id.btnThemeToggle);
 
         ImageButton btnVolver = findViewById(R.id.btnVolver);
@@ -52,6 +58,7 @@ public class PantallaPerfil extends AppCompatActivity {
         btnEditar.setOnClickListener(v -> mostrarDialogoEditar());
         btnCambiarContrasena.setOnClickListener(v -> mostrarDialogoCambiarContrasena());
         btnBorrarCuenta.setOnClickListener(v -> mostrarDialogoBorrarCuenta());
+        btnCerrarSesion.setOnClickListener(v -> cerrarSesionYSalir());
 
         androidx.appcompat.widget.SwitchCompat switchLibras = findViewById(R.id.switchLibras);
         switchLibras.setChecked(PreferenciasApp.usaLibras(this));
@@ -83,29 +90,23 @@ public class PantallaPerfil extends AppCompatActivity {
                     int edad = perfil.optInt("age", 0);
                     double peso = perfil.optDouble("peso", 0);
                     String sexo = perfil.optString("sex", "");
-                    boolean esPrivado = perfil.optInt("es_privado", 0) == 1;
 
                     tvNombre.setText(nombre);
-                    
+                    currentNombre = nombre;
+                    currentEdad = edad;
+                    currentPeso = peso;
+                    currentSexo = sexo;
+
                     String pesoStr = "--";
                     if (peso > 0) {
                         pesoStr = PreferenciasApp.formatPeso(peso, PantallaPerfil.this);
                     }
-                    
+
                     tvDetails.setText(
                             "Edad: " + (edad > 0 ? edad : "--") +
                             " | Peso: " + pesoStr +
                             " | Sexo: " + (sexo.isEmpty() ? "--" : sexo)
                     );
-
-                    androidx.appcompat.widget.SwitchCompat switchPrivado = findViewById(R.id.switchPrivado);
-                    switchPrivado.setOnCheckedChangeListener(null);
-                    switchPrivado.setChecked(esPrivado);
-                    switchPrivado.setOnCheckedChangeListener((v, isChecked) -> {
-                        new Thread(() -> {
-                            ClienteApi.obtenerInstancia().actualizarPerfil(correo, nombre, edad, peso, sexo, isChecked);
-                        }).start();
-                    });
                 } else {
                     tvNombre.setText("Usuario");
                     tvDetails.setText("No se pudo cargar el perfil");
@@ -124,22 +125,35 @@ public class PantallaPerfil extends AppCompatActivity {
 
         EditText inputNombre = new EditText(this);
         inputNombre.setHint("Nombre");
+        if (!currentNombre.isEmpty()) inputNombre.setText(currentNombre);
         layout.addView(inputNombre);
 
         EditText inputEdad = new EditText(this);
         inputEdad.setHint("Edad");
         inputEdad.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        if (currentEdad > 0) inputEdad.setText(String.valueOf(currentEdad));
         layout.addView(inputEdad);
 
         EditText inputPeso = new EditText(this);
         inputPeso.setHint("Peso (" + (PreferenciasApp.usaLibras(this) ? "lbs" : "kg") + ")");
         inputPeso.setInputType(android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL | android.text.InputType.TYPE_CLASS_NUMBER);
+        if (currentPeso > 0) {
+            double pesoMostrar = PreferenciasApp.usaLibras(this) ? currentPeso * 2.20462 : currentPeso;
+            inputPeso.setText(String.format(java.util.Locale.getDefault(), "%.1f", pesoMostrar));
+        }
         layout.addView(inputPeso);
 
         android.widget.Spinner spinnerSexo = new android.widget.Spinner(this);
         String[] opcionesSexo = {"Hombre", "Mujer", "Otro", "Prefiero no decir"};
         android.widget.ArrayAdapter<String> adapterSexo = new android.widget.ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, opcionesSexo);
         spinnerSexo.setAdapter(adapterSexo);
+        // Pre-seleccionar el sexo actual
+        for (int i = 0; i < opcionesSexo.length; i++) {
+            if (opcionesSexo[i].equalsIgnoreCase(currentSexo)) {
+                spinnerSexo.setSelection(i);
+                break;
+            }
+        }
         layout.addView(spinnerSexo);
 
         builder.setView(layout);
@@ -158,11 +172,9 @@ public class PantallaPerfil extends AppCompatActivity {
 
             int finalEdad = edad;
             double finalPeso = peso;
-            androidx.appcompat.widget.SwitchCompat switchPrivado = findViewById(R.id.switchPrivado);
-            boolean esPrivado = switchPrivado.isChecked();
 
             new Thread(() -> {
-                boolean ok = ClienteApi.obtenerInstancia().actualizarPerfil(correo, nombre, finalEdad, finalPeso, sexo, esPrivado);
+                boolean ok = ClienteApi.obtenerInstancia().actualizarPerfil(correo, nombre, finalEdad, finalPeso, sexo);
                 runOnUiThread(() -> {
                     if (ok) {
                         Toast.makeText(this, "Perfil actualizado", Toast.LENGTH_SHORT).show();

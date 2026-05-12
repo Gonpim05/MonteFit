@@ -17,7 +17,7 @@ switch ($action) {
 
     case 'getAll':
         $res = $conn->query(
-            "SELECT ejercicio_id AS _id, nombre, grupo_muscular FROM Ejercicios"
+            "SELECT ejercicio_id AS id, nombre, grupo_muscular FROM Ejercicios"
         );
         $lista = [];
         while ($row = $res->fetch_assoc()) $lista[] = $row;

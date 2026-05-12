@@ -6,13 +6,12 @@ USE MonfitDB;
 -- 1. Usuarios
 CREATE TABLE IF NOT EXISTS Usuarios (
     usuario_id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
     correo VARCHAR(150) UNIQUE NOT NULL,
     contrasena VARCHAR(255) NOT NULL,
     edad INT DEFAULT 0,
     peso DOUBLE DEFAULT 0.0,
     sexo VARCHAR(20) DEFAULT '',
-    es_privado TINYINT(1) DEFAULT 0,
     fecha_registro DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 

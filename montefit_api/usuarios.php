@@ -52,7 +52,6 @@ switch ($action) {
         echo json_encode(['nombre' => $row ? $row['nombre'] : '']);
         break;
 
-    // ── GET PROFILE ──────────────────────────
     case 'getProfile':
         $correo = $conn->real_escape_string($_GET['correo'] ?? '');
         $res = $conn->query(
@@ -82,10 +81,16 @@ switch ($action) {
         $correo    = $conn->real_escape_string($body['correo']    ?? '');
         $contrasena = $conn->real_escape_string($body['contrasena'] ?? '');
 
-        // Verificar si ya existe
+        // Verificar si ya existe el correo
         $check = $conn->query("SELECT 1 FROM Usuarios WHERE correo='$correo'");
         if ($check->num_rows > 0) {
             echo json_encode(['ok' => false, 'error' => 'El correo ya existe']);
+            break;
+        }
+        // Verificar si ya existe el nombre de usuario
+        $checkNombre = $conn->query("SELECT 1 FROM Usuarios WHERE nombre='$nombre'");
+        if ($checkNombre->num_rows > 0) {
+            echo json_encode(['ok' => false, 'error' => 'El nombre de usuario ya est\u00e1 en uso']);
             break;
         }
         $ok = $conn->query(
@@ -95,7 +100,6 @@ switch ($action) {
         echo json_encode(['ok' => $ok]);
         break;
 
-    // ── UPDATE PROFILE ───────────────────────
     case 'update':
         $body   = json_decode(file_get_contents('php://input'), true);
         $correo = $conn->real_escape_string($body['correo'] ?? '');

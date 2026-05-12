@@ -15,9 +15,18 @@ $conn   = getConexion();
 switch ($action) {
 
     case 'getAll':
+        $correo = $conn->real_escape_string($_GET['correo'] ?? '');
+        if (empty($correo)) { echo json_encode([]); break; }
+
+        // Obtener usuario_id
+        $resUid = $conn->query("SELECT usuario_id FROM Usuarios WHERE correo='$correo'");
+        $rowUid = $resUid->fetch_assoc();
+        if (!$rowUid) { echo json_encode([]); break; }
+        $uid = (int)$rowUid['usuario_id'];
+
         $res = $conn->query(
             "SELECT comida_id AS id, nombre, calorias, proteinas, carbohidratos, grasas
-             FROM Comidas"
+             FROM Comidas WHERE usuario_id=$uid"
         );
         $lista = [];
         while ($row = $res->fetch_assoc()) $lista[] = $row;

@@ -62,8 +62,8 @@ public class PantallaSocial extends AppCompatActivity {
             runOnUiThread(() -> {
                 ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this,
                         android.R.layout.simple_spinner_dropdown_item, nombresEj);
-                spinnerEjercicios.setAdapter(spinnerAdapter);
 
+                // Asignar listener ANTES del adapter para capturar la posición 0 inicial
                 spinnerEjercicios.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int pos, long id) {
@@ -72,6 +72,8 @@ public class PantallaSocial extends AppCompatActivity {
                     @Override
                     public void onNothingSelected(android.widget.AdapterView<?> parent) {}
                 });
+
+                spinnerEjercicios.setAdapter(spinnerAdapter);
             });
         }).start();
 
@@ -82,7 +84,7 @@ public class PantallaSocial extends AppCompatActivity {
     private void cargarRanking(int posSpinner) {
         if (posSpinner < 0 || posSpinner >= listaEjerciciosTodos.size()) return;
 
-        int ejercicioId = listaEjerciciosTodos.get(posSpinner).optInt("_id", 0);
+        int ejercicioId = listaEjerciciosTodos.get(posSpinner).optInt("id", 0);
 
         new Thread(() -> {
             JSONArray ranking = ClienteApi.obtenerInstancia().obtenerRankings(ejercicioId);
@@ -128,8 +130,7 @@ public class PantallaSocial extends AppCompatActivity {
 
                             String[] nombres = new String[resultados.length()];
                             for (int i = 0; i < resultados.length(); i++) {
-                                nombres[i] = resultados.optJSONObject(i).optString("nombre", "") +
-                                        " (" + resultados.optJSONObject(i).optString("correo", "") + ")";
+                                nombres[i] = resultados.optJSONObject(i).optString("nombre", "");
                             }
                             new AlertDialog.Builder(this)
                                     .setTitle("Usuarios encontrados")

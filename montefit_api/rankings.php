@@ -22,7 +22,7 @@ switch ($action) {
              FROM Rankings_Mensuales r
              JOIN Usuarios u ON r.usuario_id = u.usuario_id
              WHERE r.ejercicio_id = $eid
-               AND r.semana = WEEK(NOW())
+               AND r.semana = WEEK(NOW(), 1)
                AND r.anio   = YEAR(NOW())
              ORDER BY r.peso_maximo DESC
              LIMIT 10"
